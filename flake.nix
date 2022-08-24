@@ -39,7 +39,7 @@
     , nixos-hardware
     , gomod2nix
     , hosts
-    } @inputs:
+    }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
       inherit (flake-utils.lib.system) x86_64-linux aarch64-linux;
@@ -53,11 +53,7 @@
       mkSystem = hostName: system: modules:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [
-            ({ ... }: {
-              networking.hostName = hostName;
-            })
-          ] ++ modules;
+          modules = [{ networking.hostName = hostName; }] ++ modules;
           specialArgs = inputs;
         };
 
@@ -106,6 +102,8 @@
             };
           }
         ];
+        l380 =
+          mkSystem "l380" x86_64-linux [ ./hosts/l380/configuration.nix ];
       };
 
       deploy.nodes = {
@@ -116,6 +114,21 @@
               sshUser = "alain";
               path = deploy-rs.lib.${aarch64-linux}.activate.nixos
                 self.nixosConfigurations.rpi4;
+              user = "root";
+              sshOpts = [ "-t" ];
+              magicRollback = false;
+              autoRollback = true;
+              fastConnection = true;
+            };
+          };
+        };
+        l380 = {
+          hostname = "l380";
+          profiles = {
+            system = {
+              path = deploy-rs.lib.${x86_64-linux}.activate.nixos
+                self.nixosConfigurations.l380;
+              sshUser = "alain";
               user = "root";
               sshOpts = [ "-t" ];
               magicRollback = false;
