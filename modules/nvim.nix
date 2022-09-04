@@ -7,16 +7,10 @@
     withPython3 = true;
     withNodeJs = true;
     configure = {
-      customRC = ''
-        set background=dark
-        set termguicolors
-        set number
-      '';
+      customRC = builtins.readFile ./vimrc;
       packages.myVimPackage = {
         start = builtins.attrValues {
           inherit (pkgs.vimPlugins)
-            # sane defaults
-            vim-sensible
             # fancy status line
             vim-airline
             # themes for status line
@@ -25,9 +19,16 @@
             vim-nix
             # git
             vim-fugitive
+            # tagbar
+            tagbar
+            # languageserver
+            ale
+            # Go
+            vim-go
+            # Bitbake
+            bitbake-vim
             # collection of colorschemes
-            awesome-vim-colorschemas
-            ;
+            awesome-vim-colorschemes;
         };
       };
     };
