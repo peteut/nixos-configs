@@ -7,6 +7,7 @@ let
   routerIP = "192.168.1.1";
   myIP = "192.168.1.2";
   magicDNS = "100.100.100.100";
+  tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
 in
 {
   imports = [
@@ -123,15 +124,16 @@ in
 
   services.dnsmasq = {
     enable = true;
-    servers = [ "192.168.1.1" magicDNS ];
+    servers = [ "${routerIP}" ];
     extraConfig = ''
       bogus-priv
       filterwin2k
       no-poll
       dhcp-range=192.168.1.100,192.168.1.199,255.255.255.0,12h
-      dhcp-option=option:router,192.168.1.1
+      dhcp-option=option:router,${routerIP}
       local=/lan/
       domain=lan
+      server=/${tailscaleNet}/${magicDNS}
       expand-hosts
     '';
   };
@@ -160,4 +162,3 @@ in
   system.stateVersion = "22.05"; # Did you read the comment?
 
 }
-
