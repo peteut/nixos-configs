@@ -15,6 +15,10 @@
             vim-airline
             # themes for status line
             vim-airline-themes
+            # sugar for shell commands
+            vim-eunuch
+            # comment stuff out
+            vim-commentary
             # nix syntax
             vim-nix
             # git
