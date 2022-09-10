@@ -168,6 +168,7 @@ in
   networking.firewall = {
     enable = true;
     checkReversePath = "loose";
+    trustedInterfaces = [ "tailscale0" ];
     allowedUDPPortRanges = [{
       from = 32768;
       to = 60999;

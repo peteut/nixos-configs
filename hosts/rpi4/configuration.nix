@@ -144,6 +144,7 @@ in
   # networking.firewall.allowedTCPPorts = [ ... ];
   networking.firewall = {
     enable = true;
+    checkReversePath = "loose";
     trustedInterfaces = [ "tailscale0" ];
     allowedUDPPorts = [ 53 67 68 config.services.tailscale.port ];
   };
