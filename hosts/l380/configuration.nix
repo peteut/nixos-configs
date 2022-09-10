@@ -128,7 +128,7 @@ in
     extraGroups = [ "wheel" "audio" ];
     packages = builtins.attrValues {
       inherit (pkgs)
-        joplin-desktop calibre kicad spotify-unwrapped zoom-us remmina;
+        joplin-desktop calibre kicad spotify-unwrapped zoom-us remmina nerdfonts;
     };
   };
 
