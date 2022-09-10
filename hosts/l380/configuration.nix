@@ -47,8 +47,8 @@ in
   systemd.services.NetworkManager-wait-online.enable = false;
 
   networking = {
-    nameservers = [ magicDNS ];
-    search = [ tailscaleNet ];
+    # nameservers = [ magicDNS ];
+    # search = [ tailscaleNet ];
   };
   # Set your time zone.
   time.timeZone = "Europe/Zurich";
@@ -167,6 +167,7 @@ in
   # networking.firewall.enable = false;
   networking.firewall = {
     enable = true;
+    checkReversePath = "loose";
     allowedUDPPortRanges = [{
       from = 32768;
       to = 60999;
