@@ -210,6 +210,12 @@ nnoremap <leader>po "*p
 noremap <leader>ss :setlocal spell!<cr>
 " }}}
 
+" Deoplete-nvim {{{
+let g:deoplete#enable_at_startup = 1
+
+call deoplete#custom#option('omni_patterns', { 'go': '[^. *\t]\.\w*', })
+" }}}
+
 " Vim-airline {{{
 let g:airline_theme = 'powerlineish'
 let g:airline#extensions#branch#enabled = 1

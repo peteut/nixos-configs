@@ -29,6 +29,8 @@
             ale
             # Go
             vim-go
+            # Autocompleteion
+            deoplete-nvim
             # Bitbake
             bitbake-vim
             # collection of colorschemes
