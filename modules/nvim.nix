@@ -33,6 +33,10 @@
             deoplete-nvim
             # Bitbake
             bitbake-vim
+            # JS
+            vim-javascript
+            # Svelte
+            vim-svelte
             # collection of colorschemes
             awesome-vim-colorschemes;
         };
