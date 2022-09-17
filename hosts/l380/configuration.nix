@@ -134,12 +134,12 @@ in
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = builtins.attrValues (lib.recursiveUpdate
+  environment.systemPackages = builtins.attrValues
     {
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      inherit (pkgs) git nixfmt google-chrome tailscale;
-    }
-    { inherit (pkgs.xfce) xfce4-volumed-pulse xfce4-screenshooter; });
+      inherit (pkgs) git nixfmt google-chrome tailscale direnv openvpn;
+      inherit (pkgs.xfce) xfce4-volumed-pulse xfce4-screenshooter;
+    };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
