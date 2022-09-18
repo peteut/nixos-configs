@@ -74,6 +74,9 @@ in
       xfce = {
         enable = true;
         # enableXfwm = false;
+        thunarPlugins = builtins.attrValues {
+          inherit (pkgs.xfce) thunar-archive-plugin thunar-volman;
+        };
       };
       xterm.enable = false;
     };
