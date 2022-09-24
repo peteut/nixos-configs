@@ -131,7 +131,11 @@ in
     extraGroups = [ "wheel" "audio" ];
     packages = builtins.attrValues {
       inherit (pkgs)
-        joplin-desktop calibre kicad spotify-unwrapped zoom-us remmina nerdfonts;
+        joplin-desktop
+        calibre kicad
+        spotify-unwrapped
+        zoom-us
+        remmina;
     };
   };
 
@@ -140,8 +144,18 @@ in
   environment.systemPackages = builtins.attrValues
     {
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      inherit (pkgs) git nixfmt google-chrome tailscale direnv openvpn;
-      inherit (pkgs.xfce) xfce4-volumed-pulse xfce4-screenshooter;
+      inherit (pkgs) git
+        nixfmt
+        google-chrome
+        tailscale
+        direnv
+        openvpn;
+      inherit (pkgs.xfce)
+        xfce4-volumed-pulse
+        xfce4-screenshooter
+        xfce4-cpufreq-plugin
+        xfce4-systemload-plugin
+        xfce4-pulseaudio-plugin;
     };
 
   # Some programs need SUID wrappers, can be configured further or are
