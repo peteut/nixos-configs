@@ -155,7 +155,8 @@ in
         xfce4-screenshooter
         xfce4-cpufreq-plugin
         xfce4-systemload-plugin
-        xfce4-pulseaudio-plugin;
+        xfce4-pulseaudio-plugin
+        xfce4-sensors-plugin;
     };
 
   # Some programs need SUID wrappers, can be configured further or are
