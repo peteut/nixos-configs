@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,10 +17,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    gomod2nix = {
-      url = "github:tweag/gomod2nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     hosts = {
       url = "github:StevenBlack/hosts";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,18 +28,15 @@
     , deploy-rs
     , flake-utils
     , nixpkgs
-    , nixpkgs-unstable
     , gitignore
     , pre-commit-hooks
     , nixos-hardware
-    , gomod2nix
     , hosts
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
       inherit (flake-utils.lib.system) x86_64-linux aarch64-linux;
       inherit (gitignore.lib) gitignoreSource;
-      inherit (import ./lib.nix { inherit (nixpkgs) lib; }) zipAttrs;
       # pkgsCross = import nixpkgs {
       #   crossSystem = nixpkgs.lib.systems.examples.aarch64-multiplatform;
       #   localSystem.system = x86_64-linux;
@@ -61,10 +53,7 @@
     eachSystem [ x86_64-linux aarch64-linux ]
       (system:
       let
-        pkgs = import nixpkgs-unstable {
-          localSystem = system;
-          overlays = [ gomod2nix.overlays.default ];
-        };
+        pkgs = import nixpkgs { localSystem = system; };
       in
       {
         checks = {
@@ -84,7 +73,6 @@
           buildInputs = [
             deploy-rs.defaultPackage.${system}
             pkgs.nixpkgs-fmt
-            pkgs.gomod2nix
           ];
           inherit (self.checks.${system}.pre-commit-check) shellHook;
         };
