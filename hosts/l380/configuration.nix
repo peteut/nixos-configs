@@ -149,7 +149,9 @@ in
         google-chrome
         tailscale
         direnv
-        openvpn;
+        openvpn
+        tpm2-abrmd
+        tpm2-tools;
       inherit (pkgs.xfce)
         xfce4-volumed-pulse
         xfce4-screenshooter
