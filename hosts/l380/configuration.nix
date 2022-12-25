@@ -24,7 +24,7 @@ in
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "google-chrome"
-      "spotify-unwrapped"
+      "spotify"
       "zoom"
     ];
 
@@ -69,18 +69,18 @@ in
   services.xserver = {
     enable = true;
     videoDrivers = [ "modesetting" ];
-    useGlamor = true;
     desktopManager = {
-      xfce = {
-        enable = true;
-        # enableXfwm = false;
-        thunarPlugins = builtins.attrValues {
-          inherit (pkgs.xfce) thunar-archive-plugin thunar-volman;
-        };
-      };
+      xfce.enable = true;
       xterm.enable = false;
     };
     displayManager.defaultSession = "xfce";
+  };
+
+  programs.thunar = {
+    enable = true;
+    plugins = builtins.attrValues {
+      inherit (pkgs.xfce) thunar-archive-plugin thunar-volman;
+    };
   };
 
   # Configure keymap in X11
@@ -116,6 +116,17 @@ in
     touchpad = { disableWhileTyping = true; };
   };
 
+  security.sudo.execWheelOnly = true;
+
+  security.tpm2 = {
+    enable = true;
+    pkcs11.enable = true;
+    tctiEnvironment = {
+      enable = true;
+      interface = "tabrmd";
+    };
+  };
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # users.users.jane = {
   #   isNormalUser = true;
@@ -132,7 +143,9 @@ in
     packages = builtins.attrValues {
       inherit (pkgs)
         joplin-desktop
-        calibre kicad
+        calibre
+        kicad
+        ngspice
         spotify-unwrapped
         zoom-us
         remmina;
