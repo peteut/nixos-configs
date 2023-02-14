@@ -20,6 +20,13 @@ in
   # services.throttled.enable = true;
   # hardware.cpu.intel.updateMicrocode =
   #   config.hardware.enableRedistributableFirmware;
+  services.udev.extraRules = ''
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", \
+     ATTRS{serial}=="210299AD07E3", \
+     MODE:="0666", \
+     SYMLINK+="jtag-hs3_%n" \
+     RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
+  '';
 
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
