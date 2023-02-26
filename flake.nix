@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgsUnstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    lanzaboote.url = "github:nix-community/lanzaboote";
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -28,6 +30,8 @@
     , deploy-rs
     , flake-utils
     , nixpkgs
+    , nixpkgsUnstable
+    , lanzaboote
     , gitignore
     , pre-commit-hooks
     , nixos-hardware
@@ -53,7 +57,7 @@
     eachSystem [ x86_64-linux aarch64-linux ]
       (system:
       let
-        pkgs = import nixpkgs { localSystem = system; };
+        pkgs = nixpkgs.legacyPackages.${system};
       in
       {
         checks = {
@@ -91,7 +95,51 @@
           }
         ];
         l380 =
-          mkSystem "l380" x86_64-linux [ ./hosts/l380/configuration.nix ];
+          mkSystem "l380" x86_64-linux [
+            ./hosts/l380/configuration.nix
+
+            # nixpkgsUnstable.nixosModules.bootspec
+
+            # lanzaboote.nixosModules.lanzaboote
+
+            # ({ config, pkgs, lib, ... }: {
+            #   # boot.bootspec.enable = true;
+
+            #   environment.systemPackages = builtins.attrValues {
+            #     inherit (pkgs) sbctl;
+            #   };
+            #   # Lanzaboote currently replaces the sytemd-boot module.
+            #   boot.loader.systemd-boot.enable = lib.mkForce false;
+
+            #   boot.lanzaboote = {
+            #     enable = true;
+            #     pkiBundle = "/etc/secureboot";
+            #   };
+            # })
+          ];
+        x1 =
+          mkSystem "x1" x86_64-linux [
+            ./hosts/x1/configuration.nix
+
+            # nixpkgsUnstable.nixosModules.bootspec
+
+            # lanzaboote.nixosModules.lanzaboote
+
+            # ({ config, pkgs, lib, ... }: {
+            #   # boot.bootspec.enable = true;
+
+            #   environment.systemPackages = builtins.attrValues {
+            #     inherit (pkgs) sbctl;
+            #   };
+            #   # Lanzaboote currently replaces the sytemd-boot module.
+            #   boot.loader.systemd-boot.enable = lib.mkForce false;
+
+            #   boot.lanzaboote = {
+            #     enable = true;
+            #     pkiBundle = "/etc/secureboot";
+            #   };
+            # })
+          ];
       };
 
       deploy.nodes = {
@@ -116,6 +164,20 @@
             system = {
               path = deploy-rs.lib.${x86_64-linux}.activate.nixos
                 self.nixosConfigurations.l380;
+              sshUser = "alain";
+              user = "root";
+              sshOpts = [ "-t" ];
+              magicRollback = false;
+              autoRollback = true;
+              fastConnection = true;
+            };
+          };
+        };
+        x1 = {
+          hostname = "x1";
+          profiles = {
+            system = {
+              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.x1;
               sshUser = "alain";
               user = "root";
               sshOpts = [ "-t" ];
