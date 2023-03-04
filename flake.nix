@@ -23,6 +23,11 @@
       url = "github:StevenBlack/hosts";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   outputs =
@@ -36,6 +41,7 @@
     , pre-commit-hooks
     , nixos-hardware
     , hosts
+    , nixos-wsl
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
@@ -140,6 +146,9 @@
             #   };
             # })
           ];
+        desktop = mkSystem "desktop" x86_64-linux [
+          ./hosts/desktop/configuration.nix
+        ];
       };
 
       deploy.nodes = {
@@ -181,6 +190,20 @@
               sshUser = "alain";
               user = "root";
               sshOpts = [ "-t" ];
+              magicRollback = false;
+              autoRollback = true;
+              fastConnection = true;
+            };
+          };
+        };
+        desktop = {
+          hostname = "desktop";
+          profiles = {
+            system = {
+              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.desktop;
+              sshUser = "alain";
+              user = "root";
+              sshOpts = [ "-t" "-p 2022" ];
               magicRollback = false;
               autoRollback = true;
               fastConnection = true;
