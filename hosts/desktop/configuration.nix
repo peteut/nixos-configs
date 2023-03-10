@@ -1,4 +1,4 @@
-{ nixos-wsl, ... }:
+{ config, nixos-wsl, ... }:
 let
 in {
   imports = [
@@ -12,6 +12,16 @@ in {
     passwordAuthentication = false;
     kbdInteractiveAuthentication = false;
     permitRootLogin = "no";
+  };
+
+  time.timeZone = "Europe/Zurich";
+
+  services.tailscale = { enable = true; };
+  networking.firewall = {
+    enable = true;
+    checkReversePath = "loose";
+    trustedInterfaces = [ "tailscale0" ];
+    allowedUDPPorts = [ config.services.tailscale.port ];
   };
 
   wsl = {
