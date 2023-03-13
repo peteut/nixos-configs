@@ -30,6 +30,7 @@ in
       "google-chrome"
       "spotify"
       "zoom"
+      "teams"
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -140,6 +141,7 @@ in
         ngspice
         spotify-unwrapped
         zoom-us
+        teams
         remmina;
     };
   };
