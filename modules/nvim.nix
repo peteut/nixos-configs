@@ -37,6 +37,8 @@
             vim-javascript
             # Svelte
             vim-svelte
+            # C/C++ format
+            vim-clang-format
             # collection of colorschemes
             awesome-vim-colorschemes;
         };
