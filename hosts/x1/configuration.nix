@@ -20,9 +20,18 @@ in
   services.udev.extraRules = ''
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", \
      ATTRS{serial}=="210299AD07E3", \
-     MODE:="0666", \
+     MODE="0666", \
      SYMLINK+="jtag-hs3_%n" \
      RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
+    # STMicroelectronics STLINK-V3
+    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", MODE="0666", \
+      TAG+="uaccess"
+    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0666", \
+      TAG+="uaccess"
+    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666", \
+      TAG+="uaccess"
+    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0660", \
+      TAG+="uaccess"
   '';
 
   nixpkgs.config.allowUnfreePredicate = pkg:
