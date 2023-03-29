@@ -167,7 +167,8 @@ in
         openvpn
         tpm2-abrmd
         tpm2-tools
-        git;
+        git
+        unzip;
       inherit (pkgs.xfce)
         xfce4-volumed-pulse
         xfce4-screenshooter
