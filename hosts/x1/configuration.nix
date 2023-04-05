@@ -151,7 +151,8 @@ in
         spotify-unwrapped
         zoom-us
         teams
-        remmina;
+        remmina
+        element-desktop;
     };
   };
 
