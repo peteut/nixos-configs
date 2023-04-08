@@ -141,7 +141,7 @@ in
   users.users.alain = {
     isNormalUser = true;
     password = "";
-    extraGroups = [ "wheel" "audio" "tss" ];
+    extraGroups = [ "wheel" "audio" "tss" "dialout" ];
     packages = builtins.attrValues {
       inherit (pkgs)
         joplin-desktop
