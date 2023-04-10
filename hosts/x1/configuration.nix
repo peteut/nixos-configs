@@ -211,7 +211,7 @@ in
       from = 32768;
       to = 60999;
     }];
-    allowedUDPPorts = [ config.services.tailscale.port ];
+    allowedUDPPorts = [ config.services.tailscale.port 12345 ];
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
