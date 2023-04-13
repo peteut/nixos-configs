@@ -197,13 +197,13 @@
           };
         };
         desktop = {
-          hostname = "desktop";
+          hostname = "desktop.tail1968e.ts.net";
           profiles = {
             system = {
               path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.desktop;
               sshUser = "alain";
               user = "root";
-              sshOpts = [ "-t" "-p 2022" ];
+              sshOpts = [ "-t" ];
               magicRollback = false;
               autoRollback = true;
               fastConnection = true;

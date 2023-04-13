@@ -1,4 +1,4 @@
-{ config, nixos-wsl, ... }:
+{ config, nixos-wsl, pkgs, ... }:
 let
 in {
   imports = [
@@ -22,6 +22,8 @@ in {
     checkReversePath = "loose";
     trustedInterfaces = [ "tailscale0" ];
     allowedUDPPorts = [ config.services.tailscale.port ];
+    # Refer to https://github.com/microsoft/WSL/issues/6655
+    # package = pkgs.iptables;
   };
 
   wsl = {
@@ -30,6 +32,20 @@ in {
     defaultUser = "alain";
     startMenuLaunchers = true;
   };
+
+  users.users.alain = {
+    isNormalUser = true;
+    password = "";
+    extraGroups = [ "wheel" "users" ];
+  };
+
+  environment.systemPackages = builtins.attrValues
+    {
+      inherit (pkgs)
+        direnv
+        git
+        unzip;
+    };
 
   system.stateVersion = "22.05";
 }
