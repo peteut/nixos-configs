@@ -30,7 +30,13 @@ in
       TAG+="uaccess"
     ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666", \
       TAG+="uaccess"
-    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0660", \
+    ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0666", \
+      TAG+="uaccess"
+    # RIOT standard peripherals: https://pid.codes/1209/7D00/
+    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7d00", MODE="0666", \
+      TAG+="uaccess"
+    # RIOT riotboot DFU bootloader: https://pid.codes/1209/7D02/
+    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7d02", MODE="0666", \
       TAG+="uaccess"
   '';
 
