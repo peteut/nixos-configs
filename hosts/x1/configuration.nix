@@ -2,10 +2,11 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, nixos-hardware, lib, modulesPath, ... }:
+{ config, pkgs, nixos-hardware, lib, ... }:
 let
   magicDNS = "100.100.100.100";
   tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
+  jupyterLabDefaultPort = 8888;
 in
 {
   imports = [
@@ -218,6 +219,7 @@ in
       to = 60999;
     }];
     allowedUDPPorts = [ config.services.tailscale.port 12345 ];
+    allowedTCPPorts = [ jupyterLabDefaultPort ];
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
