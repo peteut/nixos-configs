@@ -160,6 +160,7 @@ in
         teams
         remmina
         element-desktop;
+      inherit (pkgs.texlive.combined) scheme-tetex;
     };
   };
 
