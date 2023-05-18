@@ -100,29 +100,6 @@
             };
           }
         ];
-        l380 =
-          mkSystem "l380" x86_64-linux [
-            ./hosts/l380/configuration.nix
-
-            # nixpkgsUnstable.nixosModules.bootspec
-
-            # lanzaboote.nixosModules.lanzaboote
-
-            # ({ config, pkgs, lib, ... }: {
-            #   # boot.bootspec.enable = true;
-
-            #   environment.systemPackages = builtins.attrValues {
-            #     inherit (pkgs) sbctl;
-            #   };
-            #   # Lanzaboote currently replaces the sytemd-boot module.
-            #   boot.loader.systemd-boot.enable = lib.mkForce false;
-
-            #   boot.lanzaboote = {
-            #     enable = true;
-            #     pkiBundle = "/etc/secureboot";
-            #   };
-            # })
-          ];
         x1 =
           mkSystem "x1" x86_64-linux [
             ./hosts/x1/configuration.nix
@@ -159,21 +136,6 @@
               sshUser = "alain";
               path = deploy-rs.lib.${aarch64-linux}.activate.nixos
                 self.nixosConfigurations.rpi4;
-              user = "root";
-              sshOpts = [ "-t" ];
-              magicRollback = false;
-              autoRollback = true;
-              fastConnection = true;
-            };
-          };
-        };
-        l380 = {
-          hostname = "l380";
-          profiles = {
-            system = {
-              path = deploy-rs.lib.${x86_64-linux}.activate.nixos
-                self.nixosConfigurations.l380;
-              sshUser = "alain";
               user = "root";
               sshOpts = [ "-t" ];
               magicRollback = false;
