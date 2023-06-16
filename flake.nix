@@ -2,7 +2,7 @@
   description = "My deploy-rs config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     nixpkgsUnstable.url = "github:nixos/nixpkgs/nixos-unstable";
     lanzaboote.url = "github:nix-community/lanzaboote";
     deploy-rs = {
@@ -15,7 +15,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix/nixos-22.05";
+      url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";

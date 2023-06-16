@@ -117,9 +117,11 @@ in
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
-    passwordAuthentication = false;
-    kbdInteractiveAuthentication = false;
-    permitRootLogin = "no";
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
   };
 
   services.dnsmasq = {

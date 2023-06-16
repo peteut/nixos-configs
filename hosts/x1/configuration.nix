@@ -7,6 +7,9 @@ let
   magicDNS = "100.100.100.100";
   tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
   jupyterLabDefaultPort = 8888;
+  tex = (pkgs.texlive.combine {
+    inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk;
+  });
 in
 {
   imports = [
@@ -149,7 +152,7 @@ in
     isNormalUser = true;
     password = "";
     extraGroups = [ "wheel" "audio" "tss" "dialout" ];
-    packages = builtins.attrValues {
+    packages = (builtins.attrValues {
       inherit (pkgs)
         joplin-desktop
         calibre
@@ -160,8 +163,8 @@ in
         teams
         remmina
         element-desktop;
-      inherit (pkgs.texlive.combined) scheme-tetex;
-    };
+      # inherit (pkgs.texlive.combine) scheme-full koma-script;
+    }) ++ [ tex ];
   };
 
   # List packages installed in system profile. To search, run:
@@ -200,12 +203,18 @@ in
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
-    passwordAuthentication = false;
-    kbdInteractiveAuthentication = false;
-    permitRootLogin = "no";
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
   };
 
   services.tailscale = { enable = true; };
+
+  services.fprintd = {
+    enable = true;
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
