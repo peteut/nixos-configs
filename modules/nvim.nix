@@ -1,4 +1,7 @@
 { pkgs, ... }: {
+  environment.systemPackages = builtins.attrValues {
+    inherit (pkgs) ormolu;
+  };
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -39,6 +42,8 @@
             vim-svelte
             # C/C++ format
             vim-clang-format
+            # Haskell format
+            vim-ormolu
             # collection of colorschemes
             awesome-vim-colorschemes;
         };
