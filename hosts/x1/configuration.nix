@@ -177,6 +177,7 @@ in
     {
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       inherit (pkgs)
+        gnumake
         google-chrome
         tailscale
         direnv
@@ -219,6 +220,8 @@ in
   services.fprintd = {
     enable = true;
   };
+
+  services.onedrive = { enable = true; };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
