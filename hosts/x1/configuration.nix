@@ -8,7 +8,7 @@ let
   tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
-    inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk;
+    inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk moderncv;
   });
 in
 {

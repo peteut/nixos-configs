@@ -104,6 +104,13 @@
           mkSystem "x1" x86_64-linux [
             ./hosts/x1/configuration.nix
 
+            ({ pkgs, ... }:
+              let pianoteq = pkgs.callPackage ./pkgs/pianoteq6/default.nix { };
+              in
+              {
+                environment.systemPackages = [ pianoteq ];
+              })
+
             # nixpkgsUnstable.nixosModules.bootspec
 
             # lanzaboote.nixosModules.lanzaboote
