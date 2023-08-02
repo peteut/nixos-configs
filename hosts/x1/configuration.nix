@@ -193,6 +193,7 @@ in
         xfce4-systemload-plugin
         xfce4-pulseaudio-plugin
         xfce4-sensors-plugin;
+      inherit (pkgs.cinnamon) xreader;
     };
 
   # Some programs need SUID wrappers, can be configured further or are
