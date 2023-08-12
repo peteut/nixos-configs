@@ -137,12 +137,11 @@
 
       deploy.nodes = {
         rpi4 = {
-          hostname = "192.168.1.2";
+          hostname = "rpi4.tail1968e.ts.net";
           profiles = {
             system = {
+              path = deploy-rs.lib.${aarch64-linux}.activate.nixos self.nixosConfigurations.rpi4;
               sshUser = "alain";
-              path = deploy-rs.lib.${aarch64-linux}.activate.nixos
-                self.nixosConfigurations.rpi4;
               user = "root";
               sshOpts = [ "-t" ];
               magicRollback = false;

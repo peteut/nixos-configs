@@ -7,7 +7,7 @@ let
   routerIP = "192.168.1.1";
   myIP = "192.168.1.2";
   magicDNS = "100.100.100.100";
-  tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
+  tailscaleNet = "tail1968e.ts.net";
 in
 {
   imports = [
@@ -20,12 +20,16 @@ in
 
   boot = {
     kernelPackages = pkgs.linuxPackages_rpi4;
-    tmpOnTmpfs = true;
+    tmp = {
+      useTmpfs = true;
+    };
     # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
     loader.grub.enable = false;
     # Enables the generation of /boot/extlinux/extlinux.conf
     loader.generic-extlinux-compatible.enable = true;
   };
+
+  # hardware.raspberry-pi."4".fkms-3d.enable = true;
 
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -93,7 +97,7 @@ in
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   };
   users.users."alain".openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILOdmGIJIg/3Mms+0e5VKYg5gh9SXb/sP7/uuAtiDue4 alain@l380"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIDUH/SxeU7lXwAWnxaS1HaXTeO8wbplSfjDvskvaX/j alain@x1"
   ];
 
   # List packages installed in system profile. To search, run:
@@ -126,18 +130,17 @@ in
 
   services.dnsmasq = {
     enable = true;
-    servers = [ "${routerIP}" ];
-    extraConfig = ''
-      bogus-priv
-      filterwin2k
-      no-poll
-      dhcp-range=192.168.1.100,192.168.1.199,255.255.255.0,12h
-      dhcp-option=option:router,${routerIP}
-      local=/lan/
-      domain=lan
-      server=/${tailscaleNet}/${magicDNS}
-      expand-hosts
-    '';
+    settings = {
+      server = [ "${routerIP}" "/${tailscaleNet}/${magicDNS}" ];
+      dhcp-range = [ "192.168.1.100,192.168.1.199,255.255.255.0,12h" ];
+      bogus-priv = true;
+      filterwin2k = true;
+      no-poll = true;
+      dhcp-option = [ "option:router,${routerIP}" ];
+      local = [ "/lan/" ];
+      domain = [ "lan" ];
+      expand-hosts = true;
+    };
   };
 
   services.tailscale = { enable = true; };
@@ -148,7 +151,8 @@ in
     enable = true;
     checkReversePath = "loose";
     trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ 53 67 68 config.services.tailscale.port ];
+    allowedUDPPorts = [ 53 67 68 config.services.tailscale.port 8080 ];
+    allowedTCPPorts = [ 8080 ];
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
