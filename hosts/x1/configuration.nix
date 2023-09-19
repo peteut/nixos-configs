@@ -54,6 +54,8 @@ in
       "spotify"
       "zoom"
       "teams"
+      "slack"
+      "slack-dark"
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -163,9 +165,9 @@ in
         kicad
         ngspice
         spotify-unwrapped
-        zoom-us
         teams
         remmina
+        slack-dark
         element-desktop;
       # inherit (pkgs.texlive.combine) scheme-full koma-script;
     }) ++ [ tex ];
@@ -216,13 +218,15 @@ in
     };
   };
 
-  services.tailscale = { enable = true; };
-
-  services.fprintd = {
+  services.tailscale.enable = true;
+  services.fprintd.enable = true;
+  services.onedrive.enable = true;
+  services.printing.enable = true;
+  services.avahi = {
     enable = true;
+    nssmdns = true;
+    openFirewall = true;
   };
-
-  services.onedrive = { enable = true; };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -238,6 +242,11 @@ in
     }];
     allowedUDPPorts = [ config.services.tailscale.port 12345 ];
     allowedTCPPorts = [ jupyterLabDefaultPort ];
+  };
+
+  fonts = {
+    enableDefaultFonts = true;
+    fonts = [ (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }) ];
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
