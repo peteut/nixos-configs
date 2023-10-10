@@ -48,24 +48,6 @@ in
           -- editor {{{
           ${editor}
           -- }}}
-
-          find_git_root_opts = function()
-            local function is_git_repo()
-              vim.fn.system("git rev-parse --is-inside-work-tree")
-              return vim.v.shell_error == 0
-            end
-            local function get_git_root()
-              local dot_git_path = vim.fn.finddir(".git", ".;")
-              return vim.fn.fnamemodify(dot_git_path, ":h")
-            end
-            local opts = {}
-            if is_git_repo() then
-              opts = {
-                cwd = get_git_root(),
-              }
-            end
-            return opts
-          end
         '';
       colorschemes.nord = {
         enable = true;
@@ -396,7 +378,9 @@ in
         normal."<leader>fe" = {
           action = ''
             function()
-              require("neo-tree.command").execute({ toggle = true, dir = find_git_root_opts()["cwd"] })
+              require("neo-tree.command").execute({
+                toggle = true, dir = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+              })
             end
           '';
           lua = true;
@@ -426,7 +410,12 @@ in
           desc = "Switch Buffer";
         };
         normal."<leader>/" = {
-          action = ''function() require("telescope.builtin").live_grep(find_git_root_opts()) end'';
+          action = ''
+            function()
+              require("telescope.builtin").live_grep({
+                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+              })
+            end'';
           lua = true;
           desc = "Grep (root dir)";
         };
@@ -435,7 +424,12 @@ in
           desc = "Command History";
         };
         normal."<leader><space>" = {
-          action = ''function() require("telescope.builtin").find_files(find_git_root_opts()) end'';
+          action = ''
+            function()
+              require("telescope.builtin").find_files({
+                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+              })
+            end'';
           lua = true;
           desc = "Find files (root dir)";
         };
@@ -510,7 +504,12 @@ in
           desc = "Grep (root dir)";
         };
         normal."<leader>sG" = {
-          action = ''function() require("telescope.builtin").live_grep(find_git_root_opts()) end'';
+          action = ''
+            function()
+              require("telescope.builtin").live_grep({
+                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+              })
+            end'';
           lua = true;
           desc = "Grep (cwd)";
         };
@@ -550,7 +549,12 @@ in
           desc = "Resume";
         };
         normal."<leader>sw" = {
-          action = ''function() require("telescope.builtin").grep_string(find_git_root_opts()) end'';
+          action = ''
+            function()
+              require("telescope.builtin").grep_string({
+                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+              })
+            end'';
           lua = true;
           desc = "Word (root dir)";
         };
@@ -691,9 +695,44 @@ in
                 '';
                 override = true;
               };
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
             };
-            ruff-lsp.enable = true;
-            gopls.enable = true;
+            ruff-lsp = {
+              enable = true;
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
+            gopls = {
+              enable = true;
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
+            hls = {
+              enable = true;
+              cmd = [
+                "haskell-language-server-wrapper"
+                "--lsp"
+              ];
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
+            nil_ls = {
+              enable = true;
+              rootDir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
+              extraOptions = {
+                settings = {
+                  nil = {
+                    formatting = {
+                      command = [ "nixpkgs-fmt" ];
+                    };
+                    nix = {
+                      binary = "nix";
+                      flake = {
+                        autoEvalInputs = true;
+                        nixpkgsInputName = "nixpkgs";
+                      };
+                    };
+                  };
+                };
+              };
+            };
           };
           onAttach = ''
             if client.name == "ruff_lsp" then
@@ -712,7 +751,7 @@ in
               enable = true;
             };
           };
-          rootDir = ''require("null-ls.utils").root_pattern(".null-ls-root", ".git")'';
+          rootDir = ''require("null-ls.utils").root_pattern(".git")'';
         };
         cmp-nvim-lsp.enable = true;
         cmp-path.enable = true;
@@ -761,7 +800,9 @@ in
         inherit (pkgs)
           lazygit
           fd
-          ripgrep;
+          ripgrep
+          nixpkgs-fmt
+          ;
       };
       extraPlugins = builtins.attrValues {
         inherit (pkgs.vimPlugins)
