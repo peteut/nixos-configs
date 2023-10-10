@@ -28,6 +28,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-23.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -42,6 +46,7 @@
     , nixos-hardware
     , hosts
     , nixos-wsl
+    , nixvim
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
