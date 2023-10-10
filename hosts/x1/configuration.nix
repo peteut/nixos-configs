@@ -5,7 +5,7 @@
 { config, pkgs, nixos-hardware, lib, ... }:
 let
   magicDNS = "100.100.100.100";
-  tailscaleNet = "alain-peteut.gmail.com.beta.tailscale.net";
+  tailscaleNet = "tail1968e.ts.net";
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
     inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk moderncv;
@@ -75,7 +75,7 @@ in
 
   networking = {
     # nameservers = [ magicDNS ];
-    # search = [ tailscaleNet ];
+    search = [ tailscaleNet ];
   };
   # Set your time zone.
   time.timeZone = "Europe/Zurich";
@@ -109,6 +109,9 @@ in
       inherit (pkgs.xfce) thunar-archive-plugin thunar-volman;
     };
   };
+
+  modules.nvim.enable = true;
+  environment.variables = { EDITOR = "nvim"; };
 
   # Configure keymap in X11
   services.xserver.layout = "ch";
@@ -165,7 +168,7 @@ in
         kicad
         ngspice
         spotify-unwrapped
-        teams
+        # teams
         remmina
         slack-dark
         element-desktop;
@@ -197,7 +200,6 @@ in
         xfce4-sensors-plugin;
       inherit (pkgs.cinnamon) xreader;
     };
-
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
