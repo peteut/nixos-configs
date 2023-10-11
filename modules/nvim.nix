@@ -713,6 +713,10 @@ in
               ];
               rootDir = ''require("null-ls.utils").root_pattern(".git")'';
             };
+            jsonls = {
+              enable = true;
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
             nil_ls = {
               enable = true;
               rootDir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
