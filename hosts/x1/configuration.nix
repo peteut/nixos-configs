@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, nixos-hardware, lib, ... }:
+{ config, pkgs, lanzaboote, nixos-hardware, lib, ... } @ args:
 let
   magicDNS = "100.100.100.100";
   tailscaleNet = "tail1968e.ts.net";
@@ -19,6 +19,19 @@ in
     ./hardware-configuration.nix
     nixos-hardware.nixosModules.common-pc-laptop-ssd
     nixos-hardware.nixosModules.lenovo-thinkpad-x1
+    lanzaboote.nixosModules.lanzaboote
+    ({ config, pkgs, lib, ... }: {
+      # boot.bootspec.enable = true;
+      environment.systemPackages = builtins.attrValues {
+        inherit (pkgs) sbctl;
+      };
+      # Lanzaboote currently replaces the sytemd-boot module.
+      boot.loader.systemd-boot.enable = lib.mkForce false;
+      boot.lanzaboote = {
+        enable = true;
+        pkiBundle = "/etc/secureboot";
+      };
+    })
   ];
 
   services.udev.extraRules = ''

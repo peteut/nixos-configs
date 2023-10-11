@@ -3,8 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    nixpkgsUnstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    lanzaboote.url = "github:nix-community/lanzaboote";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.3.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -39,7 +41,6 @@
     , deploy-rs
     , flake-utils
     , nixpkgs
-    , nixpkgsUnstable
     , lanzaboote
     , gitignore
     , pre-commit-hooks
@@ -115,25 +116,6 @@
               {
                 environment.systemPackages = [ pianoteq ];
               })
-
-            # nixpkgsUnstable.nixosModules.bootspec
-
-            # lanzaboote.nixosModules.lanzaboote
-
-            # ({ config, pkgs, lib, ... }: {
-            #   # boot.bootspec.enable = true;
-
-            #   environment.systemPackages = builtins.attrValues {
-            #     inherit (pkgs) sbctl;
-            #   };
-            #   # Lanzaboote currently replaces the sytemd-boot module.
-            #   boot.loader.systemd-boot.enable = lib.mkForce false;
-
-            #   boot.lanzaboote = {
-            #     enable = true;
-            #     pkiBundle = "/etc/secureboot";
-            #   };
-            # })
           ];
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
