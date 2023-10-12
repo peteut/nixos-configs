@@ -39,6 +39,9 @@ in {
     isNormalUser = true;
     password = "";
     extraGroups = [ "wheel" "users" ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIDUH/SxeU7lXwAWnxaS1HaXTeO8wbplSfjDvskvaX/j alain@x1"
+    ];
   };
 
   environment.systemPackages = builtins.attrValues
@@ -48,6 +51,9 @@ in {
         git
         unzip;
     };
+
+  modules.nvim.enable = true;
+  environment.variables = { EDITOR = "nvim"; };
 
   system.stateVersion = "22.05";
 }
