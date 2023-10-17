@@ -120,6 +120,9 @@
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];
+        ws-10 = mkSystem "ws-10" x86_64-linux [
+          ./hosts/desktop/configuration.nix
+        ];
       };
 
       deploy.nodes = {
@@ -162,6 +165,22 @@
               magicRollback = false;
               autoRollback = true;
               fastConnection = true;
+              remoteBuild = true;
+            };
+          };
+        };
+        ws-10 = {
+          hostname = "ws-10.tail1968e.ts.net";
+          profiles = {
+            system = {
+              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.ws-10;
+              sshUser = "alain";
+              user = "root";
+              sshOpts = [ "-t" ];
+              magicRollback = false;
+              autoRollback = true;
+              fastConnection = false;
+              remoteBuild = true;
             };
           };
         };
