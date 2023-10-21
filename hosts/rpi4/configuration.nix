@@ -37,7 +37,7 @@ in
   networking = {
     stevenblack = {
       enable = true;
-      block = [ "fakenews" "gambling" "porn" "social" ];
+      block = [ "fakenews" "gambling" "porn" ];
     };
     dhcpcd.enable = false;
     interfaces.eth0 = {
