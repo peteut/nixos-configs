@@ -2,6 +2,8 @@
   boot.tmp = {
     useTmpfs = true;
   };
+  # Set your time zone.
+  time.timeZone = "Europe/Zurich";
   nix = {
     settings.auto-optimise-store = true;
     gc = {

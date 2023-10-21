@@ -16,17 +16,9 @@ in
     ./hardware-configuration.nix
     nixos-hardware.nixosModules.raspberry-pi-4
     (modulesPath + "/profiles/minimal.nix")
-    hosts.nixosModule
-    {
-      networking.stevenBlackHosts = {
-        enable = true;
-        blockFakenews = true;
-        blockGambling = true;
-        blockPorn = true;
-      };
-    }
+    (modulesPath + "/profiles/headless.nix")
+    (modulesPath + "/config/stevenblack.nix")
   ];
-
 
   boot = {
     kernelPackages = pkgs.linuxPackages_rpi4;
@@ -43,6 +35,10 @@ in
   # networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
 
   networking = {
+    stevenblack = {
+      enable = true;
+      block = [ "fakenews" "gambling" "porn" "social" ];
+    };
     dhcpcd.enable = false;
     interfaces.eth0 = {
       ipv4.addresses = [{
@@ -53,9 +49,6 @@ in
     defaultGateway = routerIP;
     nameservers = [ "127.0.0.1" ];
   };
-
-  # Set your time zone.
-  time.timeZone = "Europe/Zurich";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";

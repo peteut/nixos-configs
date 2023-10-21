@@ -254,26 +254,6 @@
         "type": "github"
       }
     },
-    "hosts": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1697646757,
-        "narHash": "sha256-fPMGNj1dXrbxJDxiC8U41NLz1vL5m3Ayw8uC1HJm4sU=",
-        "owner": "StevenBlack",
-        "repo": "hosts",
-        "rev": "5b03c5f9c15dd936cff6f6d221ee023a376dde7f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "StevenBlack",
-        "repo": "hosts",
-        "type": "github"
-      }
-    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
@@ -489,7 +469,6 @@
         "deploy-rs": "deploy-rs",
         "flake-utils": "flake-utils",
         "gitignore": "gitignore",
-        "hosts": "hosts",
         "lanzaboote": "lanzaboote",
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",

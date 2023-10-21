@@ -31,10 +31,6 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hosts = {
-      url = "github:StevenBlack/hosts";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixvim = {
       url = "github:nix-community/nixvim/nixos-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,7 +47,6 @@
     , gitignore
     , pre-commit-hooks
     , nixos-hardware
-    , hosts
     , nixos-wsl
     , nixvim
     }@inputs:
@@ -99,10 +94,9 @@
         rpi4 = mkSystem "rpi4" aarch64-linux [
           ./hosts/rpi4/configuration.nix
         ];
-        x1 =
-          mkSystem "x1" x86_64-linux [
-            ./hosts/x1/configuration.nix
-          ];
+        x1 = mkSystem "x1" x86_64-linux [
+          ./hosts/x1/configuration.nix
+        ];
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];

@@ -1,6 +1,4 @@
-{ config, nixos-wsl, pkgs, ... }:
-let
-in {
+{ config, nixos-wsl, pkgs, ... }: {
   imports = [
     ../../modules/common.nix
     ../../modules/nvim.nix
@@ -15,8 +13,6 @@ in {
       PermitRootLogin = "no";
     };
   };
-
-  time.timeZone = "Europe/Zurich";
 
   services.tailscale = { enable = true; };
   networking.firewall = {
