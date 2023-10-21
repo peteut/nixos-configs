@@ -1,4 +1,7 @@
 { nixpkgs, pkgs, ... }: {
+  boot.tmp = {
+    useTmpfs = true;
+  };
   nix = {
     settings.auto-optimise-store = true;
     gc = {

@@ -4,8 +4,6 @@
 
 { config, pkgs, lanzaboote, nixos-hardware, lib, ... } @ args:
 let
-  magicDNS = "100.100.100.100";
-  tailscaleNet = "tail1968e.ts.net";
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
     inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk moderncv;
@@ -32,6 +30,13 @@ in
         pkiBundle = "/etc/secureboot";
       };
     })
+    ({ pkgs, ... }:
+      let pianoteq = pkgs.callPackage ../../pkgs/pianoteq6/default.nix { };
+      in
+      {
+        environment.systemPackages = [ pianoteq ];
+      }
+    )
   ];
 
   services.udev.extraRules = ''
@@ -86,10 +91,6 @@ in
     true; # Easiest to use and most distros use this by default.
   systemd.services.NetworkManager-wait-online.enable = false;
 
-  networking = {
-    # nameservers = [ magicDNS ];
-    search = [ tailscaleNet ];
-  };
   # Set your time zone.
   time.timeZone = "Europe/Zurich";
 
@@ -98,6 +99,7 @@ in
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Select internationalisation properties.
+  # i18n.defaultLocale = "en_US.UTF-8";
   # i18n.defaultLocale = "en_US.UTF-8";
   console = {
     font = "Lat2-Terminus16";
@@ -184,7 +186,8 @@ in
         # teams
         remmina
         slack-dark
-        element-desktop;
+        element-desktop
+        ;
       # inherit (pkgs.texlive.combine) scheme-full koma-script;
     }) ++ [ tex ];
   };
@@ -242,8 +245,6 @@ in
     nssmdns = true;
     openFirewall = true;
   };
-
-  # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;

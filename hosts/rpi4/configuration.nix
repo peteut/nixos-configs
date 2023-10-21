@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, nixos-hardware, modulesPath, ... }:
+{ config, pkgs, nixos-hardware, hosts, modulesPath, ... }:
 let
   routerIP = "192.168.1.1";
   myIP = "192.168.1.2";
@@ -16,13 +16,20 @@ in
     ./hardware-configuration.nix
     nixos-hardware.nixosModules.raspberry-pi-4
     (modulesPath + "/profiles/minimal.nix")
+    hosts.nixosModule
+    {
+      networking.stevenBlackHosts = {
+        enable = true;
+        blockFakenews = true;
+        blockGambling = true;
+        blockPorn = true;
+      };
+    }
   ];
+
 
   boot = {
     kernelPackages = pkgs.linuxPackages_rpi4;
-    tmp = {
-      useTmpfs = true;
-    };
     # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
     loader.grub.enable = false;
     # Enables the generation of /boot/extlinux/extlinux.conf

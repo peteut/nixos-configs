@@ -3,14 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.3.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    deploy-rs = {
-      url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-utils.url = "github:numtide/flake-utils";
     gitignore = {
       url = "github:hercules-ci/gitignore.nix";
@@ -19,20 +11,34 @@
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.gitignore.follows = "gitignore";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    hosts = {
-      url = "github:StevenBlack/hosts";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.3.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.pre-commit-hooks-nix.follows = "pre-commit-hooks";
+    };
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hosts = {
+      url = "github:StevenBlack/hosts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixvim = {
       url = "github:nix-community/nixvim/nixos-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
@@ -53,10 +59,6 @@
       inherit (flake-utils.lib) eachSystem;
       inherit (flake-utils.lib.system) x86_64-linux aarch64-linux;
       inherit (gitignore.lib) gitignoreSource;
-      # pkgsCross = import nixpkgs {
-      #   crossSystem = nixpkgs.lib.systems.examples.aarch64-multiplatform;
-      #   localSystem.system = x86_64-linux;
-      # };
 
       mkSystem = hostName: system: modules:
         nixpkgs.lib.nixosSystem {
@@ -96,26 +98,10 @@
       nixosConfigurations = {
         rpi4 = mkSystem "rpi4" aarch64-linux [
           ./hosts/rpi4/configuration.nix
-          hosts.nixosModule
-          {
-            networking.stevenBlackHosts = {
-              enable = true;
-              blockFakenews = true;
-              blockGambling = true;
-              blockPorn = true;
-            };
-          }
         ];
         x1 =
           mkSystem "x1" x86_64-linux [
             ./hosts/x1/configuration.nix
-
-            ({ pkgs, ... }:
-              let pianoteq = pkgs.callPackage ./pkgs/pianoteq6/default.nix { };
-              in
-              {
-                environment.systemPackages = [ pianoteq ];
-              })
           ];
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
@@ -125,65 +111,72 @@
         ];
       };
 
-      deploy.nodes = {
-        rpi4 = {
-          hostname = "rpi4.tail1968e.ts.net";
-          profiles = {
-            system = {
-              path = deploy-rs.lib.${aarch64-linux}.activate.nixos self.nixosConfigurations.rpi4;
-              sshUser = "alain";
-              user = "root";
-              sshOpts = [ "-t" ];
-              magicRollback = false;
-              autoRollback = true;
-              fastConnection = true;
+      deploy.nodes =
+        let
+          lib = nixpkgs.lib;
+          tailscaleHostname = hostname: lib.strings.concatStringsSep "." [ hostname "tail1968e" "ts" "net" ];
+          inherit (deploy-rs.lib.${aarch64-linux}) activate;
+          cfg = self.nixosConfigurations;
+        in
+        {
+          rpi4 = {
+            hostname = tailscaleHostname "rpi4";
+            profiles = {
+              system = {
+                path = activate.nixos cfg.rpi4;
+                sshUser = "alain";
+                user = "root";
+                sshOpts = [ "-t" ];
+                magicRollback = false;
+                autoRollback = true;
+                fastConnection = true;
+              };
+            };
+          };
+          x1 = {
+            hostname = "x1";
+            profiles = {
+              system = {
+                path = activate.nixos cfg.x1;
+                sshUser = "alain";
+                user = "root";
+                sshOpts = [ "-t" ];
+                magicRollback = false;
+                autoRollback = true;
+                fastConnection = true;
+              };
+            };
+          };
+          desktop = {
+            hostname = tailscaleHostname "desktop";
+            profiles = {
+              system = {
+                path = activate.nixos cfg.desktop;
+                sshUser = "alain";
+                user = "root";
+                sshOpts = [ "-t" ];
+                magicRollback = false;
+                autoRollback = true;
+                fastConnection = true;
+                remoteBuild = true;
+              };
+            };
+          };
+          ws-10 = {
+            hostname = "ws-10.tail1968e.ts.net";
+            profiles = {
+              system = {
+                path = activate.nixos cfg.ws-10;
+                sshUser = "alain";
+                user = "root";
+                sshOpts = [ "-t" ];
+                magicRollback = false;
+                autoRollback = true;
+                fastConnection = false;
+                remoteBuild = true;
+              };
             };
           };
         };
-        x1 = {
-          hostname = "x1";
-          profiles = {
-            system = {
-              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.x1;
-              sshUser = "alain";
-              user = "root";
-              sshOpts = [ "-t" ];
-              magicRollback = false;
-              autoRollback = true;
-              fastConnection = true;
-            };
-          };
-        };
-        desktop = {
-          hostname = "desktop.tail1968e.ts.net";
-          profiles = {
-            system = {
-              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.desktop;
-              sshUser = "alain";
-              user = "root";
-              sshOpts = [ "-t" ];
-              magicRollback = false;
-              autoRollback = true;
-              fastConnection = true;
-              remoteBuild = true;
-            };
-          };
-        };
-        ws-10 = {
-          hostname = "ws-10.tail1968e.ts.net";
-          profiles = {
-            system = {
-              path = deploy-rs.lib.${x86_64-linux}.activate.nixos self.nixosConfigurations.ws-10;
-              sshUser = "alain";
-              user = "root";
-              sshOpts = [ "-t" ];
-              magicRollback = false;
-              autoRollback = true;
-              fastConnection = false;
-              remoteBuild = true;
-            };
-          };
-        };
-      };
     };
 }
