@@ -13,6 +13,7 @@ in
   imports = [
     ../../modules/common.nix
     ../../modules/nvim.nix
+    ../../modules/eee.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     nixos-hardware.nixosModules.common-pc-laptop-ssd
@@ -61,9 +62,9 @@ in
     ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7d02", MODE="0666", \
       TAG+="uaccess"
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", \
-     MODE="0666", \
-     SYMLINK+="ftdi_%n" \
-     RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
+      MODE="0666", \
+      SYMLINK+="ftdi_%n" \
+      RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
   '';
 
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -80,7 +81,7 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.initrd.luks.devices."lvm".device = "/dev/disk/by-uuid/86f45bc0-dd5f-4a93-8b81-e3e825d40049";
+  boot.initrd.luks.devices."lvm".device = "/dev/disk/by-uuid/063d8986-03e5-43d2-be6e-42d3092c12d5";
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -163,6 +164,7 @@ in
   security.tpm2 = {
     enable = true;
     pkcs11.enable = true;
+    # abrmd.enable = true;
     tctiEnvironment = {
       enable = true;
       interface = "tabrmd";
@@ -177,8 +179,6 @@ in
       inherit (pkgs)
         joplin-desktop
         calibre
-        kicad
-        ngspice
         spotify-unwrapped
         # teams
         remmina
@@ -186,7 +186,7 @@ in
         element-desktop
         ;
       # inherit (pkgs.texlive.combine) scheme-full koma-script;
-    }) ++ [ tex ];
+    }) ++ [ /* tex */ ];
   };
 
   # List packages installed in system profile. To search, run:
@@ -273,6 +273,6 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "23.05"; # Did you read the comment?
 
 }
