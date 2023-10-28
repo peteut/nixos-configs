@@ -30,6 +30,7 @@
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.follows = "flake-utils";
     };
     nixvim = {
       url = "github:nix-community/nixvim/nixos-23.05";

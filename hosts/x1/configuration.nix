@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lanzaboote, nixos-hardware, lib, ... } @ args:
+{ config, pkgs, lanzaboote, nixos-hardware, lib, ... }:
 let
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
@@ -92,19 +92,6 @@ in
     true; # Easiest to use and most distros use this by default.
   systemd.services.NetworkManager-wait-online.enable = false;
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "Lat2-Terminus16";
-    # keyMap = "sg";
-    useXkbConfig = true; # use xkbOptions in tty.
-  };
-
   # Enable the X11 windowing system.
   services.xserver = {
     enable = true;
@@ -115,7 +102,13 @@ in
     };
     displayManager.defaultSession = "xfce";
   };
-
+  services.picom = {
+    enable = true;
+    fade = true;
+    inactiveOpacity = 0.9;
+    shadow = true;
+    fadeDelta = 4;
+  };
   programs.thunar = {
     enable = true;
     plugins = builtins.attrValues {

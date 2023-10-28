@@ -4,6 +4,11 @@
   };
   # Set your time zone.
   time.timeZone = "Europe/Zurich";
+  # Select internationalisation properties.
+  console = {
+    font = "Lat2-Terminus16";
+    keyMap = "sg";
+  };
   nix = {
     settings.auto-optimise-store = true;
     gc = {
