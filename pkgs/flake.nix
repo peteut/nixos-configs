@@ -19,7 +19,7 @@
       {
         packages = {
           atlc = pkgs.callPackage ./atlc/default.nix { };
-          pianoteq = pkgs.callPackage ./pianoteq6/default.nix { };
+          pianoteq = pkgs.callPackage ./pianoteq/default.nix { };
         };
       });
 }
