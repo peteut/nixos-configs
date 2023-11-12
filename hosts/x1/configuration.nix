@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lanzaboote, nixos-hardware, lib, ... }:
+{ config, pkgs, lanzaboote, nixos-hardware, musnix, lib, ... }:
 let
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
@@ -31,6 +31,7 @@ in
         pkiBundle = "/etc/secureboot";
       };
     })
+    musnix.nixosModules.musnix
     ({ pkgs, ... }:
       let pianoteq = pkgs.callPackage ../../pkgs/pianoteq/default.nix { };
       in
@@ -66,6 +67,11 @@ in
       SYMLINK+="ftdi_%n" \
       RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
   '';
+
+  musnix = {
+    enable = true;
+    # soundcardPciId = "00:1f.3";
+  };
 
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [

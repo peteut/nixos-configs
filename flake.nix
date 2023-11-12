@@ -37,6 +37,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    musnix = {
+      url = "github:musnix/musnix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -50,6 +54,7 @@
     , nixos-hardware
     , nixos-wsl
     , nixvim
+    , musnix
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
