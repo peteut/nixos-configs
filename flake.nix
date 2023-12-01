@@ -115,7 +115,8 @@
         let
           lib = nixpkgs.lib;
           tailscaleHostname = hostname: lib.strings.concatStringsSep "." [ hostname "tail1968e" "ts" "net" ];
-          inherit (deploy-rs.lib.${aarch64-linux}) activate;
+          inherit (deploy-rs.lib.${aarch64-linux}) activateArm;
+          inherit (deploy-rs.lib.${x86_64-linux}) activate;
           cfg = self.nixosConfigurations;
         in
         {
@@ -123,7 +124,7 @@
             hostname = tailscaleHostname "rpi4";
             profiles = {
               system = {
-                path = activate.nixos cfg.rpi4;
+                path = activateArm.nixos cfg.rpi4;
                 sshUser = "alain";
                 user = "root";
                 sshOpts = [ "-t" ];
@@ -163,7 +164,7 @@
             };
           };
           ws-10 = {
-            hostname = "ws-10.tail1968e.ts.net";
+            hostname = tailscaleHostname "ws-10";
             profiles = {
               system = {
                 path = activate.nixos cfg.ws-10;
@@ -172,7 +173,7 @@
                 sshOpts = [ "-t" ];
                 magicRollback = false;
                 autoRollback = true;
-                fastConnection = false;
+                fastConnection = true;
                 remoteBuild = true;
               };
             };
