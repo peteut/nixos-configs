@@ -1,6 +1,6 @@
 -- auto pairs {{{
-  require("mini.pairs").setup()
+require("mini.pairs").setup()
 -- }}}
 -- comments {{{
-  require("mini.comment").setup()
+require("mini.comment").setup()
 -- }}}

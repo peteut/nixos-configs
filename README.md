@@ -5,7 +5,7 @@ Uses [deploy-rs](https://github.com/serokell/deploy-rs) for deployments. for dep
 
 ### Deployment
 
-Update  _my-node_ by invoking `deploy .#my-node`. 
+Update  _my-node_ by invoking `LOCAL_KEY=key.nix deploy .#my-node`.
 
 ### TODO
 
