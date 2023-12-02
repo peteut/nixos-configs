@@ -41,6 +41,15 @@ in
     )
   ];
 
+  virtualisation = {
+    podman = {
+      enable = true;
+      dockerCompat = true;
+      autoPrune.enable = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
+  };
+
   services.udev.extraRules = ''
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", \
      ATTRS{serial}=="210299AD07E3", \
@@ -114,6 +123,7 @@ in
     inactiveOpacity = 0.9;
     shadow = false;
     fadeDelta = 4;
+    vSync = true;
   };
   programs.thunar = {
     enable = true;
@@ -132,23 +142,86 @@ in
   #   "caps:escape" # map caps to escape.
   # };
 
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  sound.enable = true;
   hardware.pulseaudio = {
-    enable = true;
+    enable = false;
     extraConfig = ''
       load-module module-switch-on-connect
     '';
-    package = pkgs.pulseaudioFull;
+    package = pkgs.pulseaudioFull.override { jackaudioSupport = true; };
   };
-
-  # Bluetooth
-  hardware.bluetooth = {
+  services.jack = {
+    jackd.enable = false;
+    alsa.enable = false;
+  };
+  security.rtkit.enable = true;
+  services.pipewire = {
     enable = true;
-    settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
+    audio.enable = true;
+    jack.enable = true;
+    pulse.enable = true;
+    alsa.enable = true;
+  };
+  environment.etc =
+    let
+      json = pkgs.formats.json { };
+    in
+    {
+      "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
+        bluez_monitor.properties = {
+          ["bluez5.enable-sbc-xq"] = true,
+          ["bluez5.enable-msbc"] = true,
+          ["bluez5.enable-hw-volume"] = true,
+          ["bluez5.headset-roles"] = "[ hsp_hs hsp_ag hfp_hf hfp_ag ]"
+        }
+      '';
+      "pipewire/pipewire.d/91-null-sinks.conf".source = json.generate "91-null-sinks.conf" {
+        context.objects = [
+          {
+            # A default dummy driver. This handles nodes marked with the "node.always-driver"
+            # properyty when no other driver is currently active. JACK clients need this.
+            factory = "spa-node-factory";
+            args = {
+              factory.name = "support.node.driver";
+              node.name = "Dummy-Driver";
+              node.group = "pipewire.dummy";
+              priority.driver = 20000;
+            };
+          }
+          {
+            factory = "spa-node-factory";
+            args = {
+              factory.name = "support.node.driver";
+              node.name = "Freewheel-Driver";
+              node.freewheel = true;
+              node.group = "  pipewrite.freewheel";
+              priority.driver = 19000;
+            };
+          }
+          {
+            factory = "adapter";
+            args = {
+              factory.name = "support.null-audio-sink";
+              node.name = "Main-Output-Proxy";
+              node.description = "Main Output";
+              media.class = "Audio/Sink";
+              audio.position = "FL,FR";
+            };
+          }
+        ];
+      };
+    };
+
+  hardware = {
+    opengl = {
+      enable = true;
+      extraPackages = builtins.attrValues {
+        inherit (pkgs) intel-media-driver;
+      };
+    };
+    bluetooth = {
+      enable = true;
+      settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
+    };
   };
   services.blueman.enable = true;
 
@@ -173,7 +246,7 @@ in
   users.users.alain = {
     isNormalUser = true;
     password = "";
-    extraGroups = [ "wheel" "audio" "tss" "dialout" ];
+    extraGroups = [ "wheel" "audio" "jackaudio" "tss" "dialout" ];
     packages = (builtins.attrValues {
       inherit (pkgs)
         joplin-desktop
@@ -183,14 +256,15 @@ in
         remmina
         slack-dark
         element-desktop
+        pavucontrol
+        qpwgraph
         ;
-      # inherit (pkgs.texlive.combine) scheme-full koma-script;
-    }) ++ [ /* tex */ ];
+    }) ++ [ tex ] ++ [ pkgs.pipewire.jack ];
   };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = builtins.attrValues
+  environment.systemPackages = (builtins.attrValues
     {
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       inherit (pkgs)
@@ -202,7 +276,8 @@ in
         tpm2-abrmd
         tpm2-tools
         git
-        unzip;
+        unzip
+        pulseaudioFull;
       inherit (pkgs.xfce)
         xfce4-volumed-pulse
         xfce4-screenshooter
@@ -211,7 +286,7 @@ in
         xfce4-pulseaudio-plugin
         xfce4-sensors-plugin;
       inherit (pkgs.cinnamon) xreader;
-    };
+    });
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
