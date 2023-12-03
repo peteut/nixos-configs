@@ -135,6 +135,17 @@ in
   modules.nvim.enable = true;
   environment.variables = { EDITOR = "nvim"; };
 
+  services.tlp = {
+    enable = true;
+    settings = {
+      START_CHARGE_THRESH_BAT0 = 40;
+      STOP_CHARGE_THRESH_BAT0 = 80;
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 0;
+      PLATFORM_PROFILE_ON_AC = "balanced";
+      PLATFORM_PROFILE_ON_BAT = "low-power";
+    };
+  };
   # Configure keymap in X11
   services.xserver.layout = "ch";
   # services.xserver.xkbOptions = {
