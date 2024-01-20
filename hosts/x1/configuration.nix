@@ -146,6 +146,7 @@ in
       PLATFORM_PROFILE_ON_BAT = "low-power";
     };
   };
+  services.fwupd.enable = true;
   # Configure keymap in X11
   services.xserver.layout = "ch";
   # services.xserver.xkbOptions = {
