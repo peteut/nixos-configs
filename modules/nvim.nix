@@ -22,9 +22,9 @@ in
 
         -- Files, backup and undo {{{
         -- Turn backup off, since most stuff is in SVN, git etc. anyway...
-        vim.o.nobackup = true
-        vim.o.nowb = true
-        vim.o.noswapfile = true
+        vim.opt.backup = false
+        vim.opt.wb = true
+        vim.opt.swapfile = false
         -- }}}
         -- regex {{{
         -- For regular expressions turn magic on
