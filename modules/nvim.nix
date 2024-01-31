@@ -717,6 +717,9 @@ in
               enable = true;
               rootDir = ''require("null-ls.utils").root_pattern(".git")'';
             };
+            clangd = {
+              enable = true;
+            };
             nil_ls = {
               enable = true;
               rootDir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
