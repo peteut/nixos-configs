@@ -115,7 +115,7 @@
         let
           lib = nixpkgs.lib;
           tailscaleHostname = hostname: lib.strings.concatStringsSep "." [ hostname "tail1968e" "ts" "net" ];
-          inherit (deploy-rs.lib.${aarch64-linux}) activateArm;
+          activateArm = deploy-rs.lib.${aarch64-linux}.activate;
           inherit (deploy-rs.lib.${x86_64-linux}) activate;
           cfg = self.nixosConfigurations;
         in
