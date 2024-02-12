@@ -142,8 +142,16 @@ in
       STOP_CHARGE_THRESH_BAT0 = 80;
       CPU_BOOST_ON_AC = 1;
       CPU_BOOST_ON_BAT = 0;
+      CPU_HWP_DYN_BOOST_ON_AC = 1;
+      CPU_HWP_DYN_BOOST_ON_BAT = 0;
+      CPU_ENERGY_PERF_POLICY_ON_AC = "balanced_performance";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
       PLATFORM_PROFILE_ON_AC = "balanced";
       PLATFORM_PROFILE_ON_BAT = "low-power";
+      RUNTIME_PM_ON_AC = "auto";
+      RUNTIME_PM_ON_BAT = "auto";
+      WIFI_PWR_ON_AC = "on";
+      WIFI_PWR_ON_BAT = "on";
     };
   };
   services.fwupd.enable = true;
