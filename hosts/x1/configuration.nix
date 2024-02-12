@@ -125,6 +125,7 @@ in
     fadeDelta = 4;
     vSync = true;
   };
+  programs.hyprland.enable = true;
   programs.thunar = {
     enable = true;
     plugins = builtins.attrValues {
@@ -352,8 +353,8 @@ in
   };
 
   fonts = {
-    enableDefaultFonts = true;
-    fonts = [ (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }) ];
+    enableDefaultPackages = true;
+    packages = [ (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }) ];
   };
 
   # Copy the NixOS configuration file and link it from the resulting system

@@ -11,24 +11,89 @@ in
   config = mkIf cfg.enable {
     programs.nixvim = {
       enable = true;
+      globals = {
+        mapleader = ",";
+        maplocalleader = ",";
+        autoformat = true;
+        markdown_recommended_stle = 0;
+        # LazyVim root dir detection
+        # Each entry can be:
+        # * the name of a detector function like `lsp` or `cwd`
+        # * a pattern or array of patterns like `.git` or `lua`.
+        # * a function with signature `function(buf) -> string|string[]`
+        root_spec = [ "lsp" [ ".git" "lua" ] "cwd" ];
+      };
+      options = {
+        # Turn backup off, since most stuff is in SVN, git etc. anyway...
+        backup = false;
+        wb = true;
+        swapfile = false;
+        # autowrite = true; # Enable auto write
+        clipboard = "unnamedplus"; # Sync with system clipboard
+        completeopt = "menu,menuone,noselect";
+        conceallevel = 2; # Hide * markup for bold and italic, but not markers w/ substitutions
+        confirm = true; # Confirm to save changes before exiting modified buffer
+        cursorline = true; # Enable highlighting of the current line
+        expandtab = true; # Use spaces instead of tabs
+        formatoptions = "jcroqlnt"; # tcqj
+        grepformat = "%f:%l:%c:%m";
+        grepprg = "rg --vimgrep";
+        ignorecase = true; # Ignore case
+        magic = true;
+        inccommand = "nosplit"; # preview incremental substitute
+        laststatus = 3; # global statusline
+        list = true; # Show some invisible characters (tabs...
+        mouse = "a"; # Enable mouse mode
+        number = true; # Print line number
+        pumblend = 10; # Popup blend
+        pumheight = 10; # Maximum number of entries in a popup
+        relativenumber = true; # Relative line numbers
+        scrolloff = 4; # Lines of context
+        sessionoptions = [ "buffers" "curdir" "tabpages" "winsize" "help" "globals" "skiprtp" "folds" ];
+        shiftround = true; # Round indent
+        shiftwidth = 2; # Size of an indent
+        showmode = false; # Dont show mode since we have a statusline
+        sidescrolloff = 8; # Columns of context
+        signcolumn = "yes"; # Always show the signcolumn, otherwise it would shift the text each time
+        smartcase = true; # Don't ignore case with capitals
+        smartindent = true; # Insert indents automatically
+        spelllang = [ "en" ];
+        splitbelow = true; # Put new windows below current
+        splitkeep = "screen";
+        splitright = true; # Put new windows right of current
+        tabstop = 2; # Number of spaces tabs count for
+        termguicolors = true; # True colour support
+        virtualedit = "block"; # Allow cursor to move where there is no text in visual block mode
+        # wildmode = "longest:full,full"; # Command-line completion mode
+        winminwidth = 5; # Minimum window width
+        wrap = false; # Disable line wrap
+        fillchars = {
+          foldopen = "";
+          foldclose = "";
+          # fold = "⸱";
+          fold = " ";
+          foldsep = " ";
+          diff = "╱";
+          eob = " ";
+        };
+      };
       extraConfigLuaPre = ''
         -- LazyVim {{{
-        require("lazyvim.config.options")
+        require("lazyvim.config.init")
         require("lazyvim.config.autocmds")
-        -- }}}
-
-        vim.g.mapleader = ","
-        vim.g.maplocalleader = ","
-
-        -- Files, backup and undo {{{
-        -- Turn backup off, since most stuff is in SVN, git etc. anyway...
-        vim.opt.backup = false
-        vim.opt.wb = true
-        vim.opt.swapfile = false
+        local opt = vim.opt
+        opt.shortmess:append({ W = true, I = true, c = true, C = true })
+        if vim.fn.has("nvim-0.10") == 1 then
+          opt.smoothscroll = true
+        end
+        vim.o.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
+        -- Folding
+        opt.foldlevel = 99
+        opt.foldtext = "v:lua.require'lazyvim.util'.ui.foldtext()"
+        opt.statuscolumn = [[%!v:lua.require'lazyvim.util'.ui.statuscolumn()]]
+        opt.foldmethod = "indent"
         -- }}}
         -- regex {{{
-        -- For regular expressions turn magic on
-        vim.o.magic = true
         vim.keymap.set({ "n", "v" }, "/", "/\\v", { desc = "Sane Regexes" })
         -- }}}
       '';
@@ -37,7 +102,7 @@ in
           coding = builtins.readFile ./nvim/coding.lua;
           ui = builtins.readFile ./nvim/ui.lua;
           editor = builtins.readFile ./nvim/editor.lua;
-          lsp-keymaps = builtins.readFile ./nvim/plugins/lsp/keymaps.lua;
+          # lsp-keymaps = builtins.readFile ./nvim/plugins/lsp/keymaps.lua;
         in
         ''
           -- coding {{{
@@ -49,11 +114,6 @@ in
           -- editor {{{
           ${editor}
           -- }}}
-          -- plugins {{{
-          -- lsp {{{
-          ${lsp-keymaps}
-          -- }}}
-          -- }}}
         '';
       colorschemes.nord = {
         enable = true;
@@ -64,71 +124,161 @@ in
       globals = {
         neo_tree_remove_legacy_commands = true;
       };
-      maps = {
+      keymaps = [
         # stop using arrow keys {{{
-        normalVisualOp."<left>" = "<nop>";
-        normalVisualOp."<up>" = "<nop>";
-        normalVisualOp."<down>" = "<nop>";
-        normalVisualOp."<right>" = "<nop>";
+        {
+          key = "<left>";
+          action = "<nop>";
+        }
+        {
+          key = "<up>";
+          action = "<nop>";
+        }
+        {
+          key = "<down>";
+          action = "<nop>";
+        }
+        {
+          key = "<right>";
+          action = "<nop>";
+        }
         # }}}
         # better up/down {{{
-        normal."j" = {
+        {
+          mode = "n";
+          key = "j";
           action = ''v:count == 0 ? "gj" : "j"'';
-          expr = true;
-          silent = true;
-        };
-        normal."k" = {
+          options = {
+            expr = true;
+            silent = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "k";
           action = ''v:count == 0 ? "gk" : "k"'';
-          expr = true;
-          silent = true;
-        };
+          options = {
+            expr = true;
+            silent = true;
+          };
+        }
         # }}}
         # Move to window using the <ctrl> hjkl keys {{{
-        normal."<C-h>" = {
+        {
+          mode = "n";
+          key = "<C-h>";
           action = "<C-w>h";
-          desc = "Go to left window";
-        };
-        terminal."<C-h>" = "<C-\\><C-N><C-w>h";
-        normal."<C-j>" = {
+          options = {
+            desc = "Go to left window";
+          };
+        }
+        {
+          mode = "t";
+          key = "<C-h>";
+          action = "<C-\\><C-N><C-w>h";
+          options = {
+            desc = "Go to left window";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-j>";
           action = "<C-w>j";
-          desc = "Go to lower window";
-        };
-        terminal."<C-j>" = "<C-\\><C-N><C-w>j";
-        normal."<C-k>" = {
+          options = {
+            desc = "Go to lower window";
+          };
+        }
+        {
+          mode = "t";
+          key = "<C-j>";
+          action = "<C-\\><C-N><C-w>j";
+          options = {
+            desc = "Go to lower window";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-k>";
           action = "<C-w>k";
-          desc = "Go to upper window";
-        };
-        terminal."<C-k>" = "<C-\\><C-N><C-w>k";
-        normal."<C-l>" = {
+          options = {
+            desc = "Go to upper window";
+          };
+        }
+        {
+          mode = "t";
+          key = "<C-k>";
+          action = "<C-\\><C-N><C-w>k";
+          options = {
+            desc = "Go to upper window";
+          };
+        }
+        {
+          mode = "t";
+          key = "<C-k>";
+          action = "<C-\\><C-N><C-w>k";
+          options = {
+            desc = "Go to upper window";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-l>";
           action = "<C-w>l";
-          desc = "Go to right window";
-        };
-        terminal."<C-l>" = "<C-\\><C-N><C-w>l";
+          options = {
+            desc = "Go to right window";
+          };
+        }
+        {
+          mode = "t";
+          key = "<C-l>";
+          action = "<C-\\><C-N><C-w>l";
+          options = {
+            desc = "Go to right window";
+          };
+        }
         # }}}
         # Resize window using <ctrl> arrow keys {{{
-        normal."<C-Up>" = {
+        {
+          mode = "n";
+          key = "<C-Up>";
           action = ''function() vim.api.nvim_win_set_height(0, vim.api.nvim_win_get_height(0) + 2) end'';
           lua = true;
-          desc = "Increase window height";
-        };
-        normal."<C-Down>" = {
+          options = {
+            desc = "Increase window height";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-Down>";
           action = ''function() vim.api.nvim_win_set_height(0,  vim.api.nvim_win_get_height(0) - 2) end'';
           lua = true;
-          desc = "Decrease window height";
-        };
-        normal."<C-Left>" = {
+          options = {
+            desc = "Decrease window height";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-Left>";
           action = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) - 2) end'';
           lua = true;
-          desc = "Decrease window width";
-        };
-        normal."<C-Right>" = {
+          options = {
+            desc = "Decrease window width";
+          };
+        }
+        {
+          mode = "n";
+          key = "<C-Right>";
           action = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) + 2) end'';
           lua = true;
-          desc = "Increase window width";
-        };
+          options = {
+            desc = "Increase window width";
+          };
+        }
         # }}}
         # mini.bufremove {{{
-        normal."<leader>bd" = {
+        {
+          mode = "n";
+          key = "<leader>bd";
           action = ''
             function()
               local bd = require("mini.bufremove").delete
@@ -145,243 +295,408 @@ in
               end
             end'';
           lua = true;
-          desc = "Delete Buffer";
-        };
-        normal."<leader>bD" = {
+          options = {
+            desc = "Delete Buffer";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>bD";
           action = ''function() require("mini.bufremove").delete(0, true) end'';
           lua = true;
-          desc = "Delete Buffer (Force)";
-        };
+          options = {
+            desc = "Delete Buffer (Force)";
+          };
+        }
         # }}}
         # buffers {{{
-        normal."<S-h>" = {
+        {
+          mode = "n";
+          key = "<S-h>";
           action = "<cmd>BufferLineCyclePrev<cr>";
-          silent = true;
-          desc = "Pref buffer";
-        };
-        normal."<S-l>" = {
+          options = {
+            desc = "Pref buffer";
+            silent = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "<S-l>";
           action = "<cmd>BufferLineCycleNext<cr>";
-          silent = true;
-          desc = "Next buffer";
-        };
-        normal."[b" = {
+          options = {
+            desc = "Next buffer";
+            silent = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "[b";
           action = "<S-h>";
-          remap = true;
-          desc = "Prev buffer";
-        };
-        normal."b]" = {
+          options = {
+            desc = "Prev buffer";
+            remap = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "b]";
           action = "<S-l>";
-          remap = true;
-          desc = "Next buffer";
-        };
+          options = {
+            desc = "Next buffer";
+            remap = true;
+          };
+        }
         # }}}
         # Clear search with <esc> {{{
-        normal."<esc>" = {
+        {
+          mode = "n";
+          key = "<esc>";
           action = "<cmd>noh<cr><esc>";
-          desc = "Escape and clear hlsearch";
-          silent = true;
-        };
-        insert."<esc>" = {
+          options = {
+            desc = "Escape and clear hlsearch";
+            silent = true;
+          };
+        }
+        {
+          mode = "i";
+          key = "<esc>";
           action = "<cmd>noh<cr><esc>";
-          desc = "Escape and clear hlsearch";
-          silent = true;
-        };
+          options = {
+            desc = "Escape and clear hlsearch";
+            silent = true;
+          };
+        }
         # }}}
         # search word under cursor {{{
-        normal."gw" = {
+        {
+          mode = "n";
+          key = "gw";
           action = "*N";
-          desc = "Search word under cursor";
-        };
-        visual."gw" = {
+          options = {
+            desc = "Search word under cursor";
+          };
+        }
+        {
+          mode = "v";
+          key = "gw";
           action = "*N";
-          desc = "Search word under cursor";
-        };
+          options = {
+            desc = "Search word under cursor";
+          };
+        }
         # }}}
         #  {{{
-        normalVisualOp."n" = {
+        {
+          key = "n";
           action = '''Nn'[v:searchforward]'';
-          expr = true;
-          desc = "Next search result";
-        };
-        normalVisualOp."N" = {
+          options = {
+            expr = true;
+            desc = "Next search result";
+          };
+        }
+        {
+          key = "N";
           action = '''nN'[v:searchforward]'';
-          expr = true;
-          desc = "Prev search result";
-        };
+          options = {
+            expr = true;
+            desc = "Prev search result";
+          };
+        }
         # }}}
         # add undo break-pints {{{
-        insert."," = {
+        {
+          mode = "n";
+          key = ",";
           action = ",<c-g>u";
-        };
-        insert."." = {
+        }
+        {
+          mode = "i";
+          key = ".";
           action = ".<c-g>u";
-        };
-        insert.";" = {
+        }
+        {
+          mode = "i";
+          key = ";";
           action = ";<c-g>u";
-        };
+        }
         # }}}
         # save file {{{
-        normalVisualOp."<C-s>" = {
+        {
+          key = "<C-s>";
           action = "<cmd>w<cr><esc>";
-          desc = "Save file";
-        };
+          options = {
+            desc = "Save file";
+          };
+        }
         # }}}
         # better indenting {{{
-        visual."<" = {
+        {
+          mode = "v";
+          key = "<";
           action = "<gv";
-        };
-        visual.">" = {
+        }
+        {
+          mode = "v";
+          key = ">";
           action = ">gv";
-        };
+        }
         # }}}
         # new file {{{
-        normal."<leader>fn" = {
+        {
+          mode = "n";
+          key = "<leader>fn";
           action = "<cmd>enew<cr>";
-          desc = "New File";
-        };
+          options = {
+            desc = "New File";
+          };
+        }
         # }}}
         # toggle options {{{
         # TODO: migrate keymaps
         # }}}
         # quit {{{
-        normal."<leader>qq" = {
+        {
+          mode = "n";
+          key = "<leader>qq";
           action = "<cmd>qa<cr>";
-          desc = "Quit all";
-        };
+          options = {
+            desc = "Quit all";
+          };
+        }
         # }}}
         # Hightlight under cursor {{{
-        normal."<leader>ui" = {
+        {
+          mode = "n";
+          key = "<leader>ui";
           action = ''vim.show_pos'';
-          desc = "Inspect Pos";
-        };
+          options = {
+            desc = "Inspect Pos";
+          };
+        }
         # }}}
         # terminal {{{
         # TODO: floating terminal?
-        terminal."<esc><esc>" = {
+        {
+          mode = "t";
+          key = "<esc><esc>";
           action = "<c-\\><c-n>";
-          desc = "Enter Normal Mode";
-        };
+          options = {
+            desc = "Enter Normal Mode";
+          };
+        }
         # }}}
         # window {{{
-        normal."<leader>ww" = {
+        {
+          mode = "n";
+          key = "<leader>ww";
           action = "<C-W>p";
-          desc = "Other Window";
-        };
-        normal."<leader>wd" = {
+          options = {
+            desc = "Other Window";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>wd";
           action = "<C-W>c";
-          desc = "Delete Window";
-        };
-        normal."<leader>w-" = {
+          options = {
+            desc = "Delete Window";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>w-";
           action = "<C-W>s";
-          desc = "Split Window Below";
-        };
-        normal."<leader>w|" = {
+          options = {
+            desc = "Split Window Below";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>w|";
           action = "<C-W>v";
-          desc = "Split Window Right";
-        };
-        normal."<leader>-" = {
+          options = {
+            desc = "Split Window Right";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>-";
           action = "<C-W>s";
-          desc = "Split Window Below";
-        };
-        normal."<leader>|" = {
+          options = {
+            desc = "Split Window Below";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>|";
           action = "<C-W>v";
-          desc = "Split Window Right";
-        };
+          options = {
+            desc = "Split Window Right";
+          };
+        }
         # }}}
         # tabs {{{
-        normal."<leader><tab>l" = {
+        {
+          mode = "n";
+          key = "<leader><tab>l";
           action = "<cmd>tablast<cr>";
-          desc = "Last Tab";
-        };
-        normal."<leader><tab>f" = {
+          options = {
+            desc = "Last Tab";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><tab>f";
           action = "<cmd>tabfirst<cr>";
-          desc = "First Tab";
-        };
-        normal."<leader><tab><tab>" = {
+          options = {
+            desc = "First Tab";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><tab><tab>";
           action = "<cmd>tabnew<cr>";
-          desc = "New Tab";
-        };
-        normal."<leader><tab>]" = {
+          options = {
+            desc = "New Tab";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><tab>]";
           action = "<cmd>tabnext<cr>";
-          desc = "Next Tab";
-        };
-        normal."<leader><tab>d" = {
+          options = {
+            desc = "Next Tab";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><tab>d";
           action = "<cmd>tabclose<cr>";
-          desc = "Close Tab";
-        };
-        normal."<leader><tab>[" = {
+          options = {
+            desc = "Close Tab";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><tab>[";
           action = "<cmd>tabprevious<cr>";
-          desc = "Previous Tab";
-        };
+          options = {
+            desc = "Previous Tab";
+          };
+        }
         # }}}
         # {{{
-        normal."<leader>xl" = {
+        {
+          mode = "n";
+          key = "<leader>xl";
           action = "<cmd>lopen<cr>";
-          desc = "Location List";
-        };
-        normal."<leader>xq" = {
+          options = {
+            desc = "Location List";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>xq";
           action = "<cmd>copen<cr>";
-          desc = "Quickfix List";
-        };
+          options = {
+            desc = "Quickfix List";
+          };
+        }
         # }}}
         # bufferline {{{
-        normal."<leader>bp" = {
+        {
+          mode = "n";
+          key = "<leader>bp";
           action = "<cmd>BufferLineTogglePin<cr>";
-          desc = "Toggle pin";
-          silent = true;
-        };
-        normal."<leader>bP" = {
+          options = {
+            desc = "Toggle pin";
+            silent = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>bP";
           action = "<cmd>BufferLineGroupClose ungrouped<cr>";
-          desc = "Delete non-pinned buffers";
-          silent = true;
-        };
+          options = {
+            desc = "Delete non-pinned buffers";
+            silent = true;
+          };
+        }
         # }}}
         # noicer ui {{{
-        command."<S-Enter>" = {
+        {
+          mode = "c";
+          key = "<S-Enter>";
           action = ''function() require("noice").redirect(vim.fn.getcmdline()) end'';
           lua = true;
-          desc = "Redirect Cmdline";
-        };
-        normal."<leader>snl" = {
+          options = {
+            desc = "Redirect Cmdline";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>snl";
           action = ''function() require("noice").cmd("last") end'';
           lua = true;
-          desc = "Noice Last Message";
-        };
-        normal."<leader>snh" = {
+          options = {
+            desc = "Noice Last Message";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>snh";
           action = ''function() require("noice").cmd("history") end'';
           lua = true;
-          desc = "Noice History";
-        };
-        normal."<leader>sna" = {
+          options = {
+            desc = "Noice History";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sna";
           action = ''function() require("noice").cmd("all") end'';
           lua = true;
-          desc = "Noice All";
-        };
-        normal."<leader>snd" = {
+          options = {
+            desc = "Noice All";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>snd";
           action = ''function() require("noice").cmd("dismiss") end'';
           lua = true;
-          desc = "Dismiss All";
-        };
-        normalVisualOp."<c-f>" = {
+          options = {
+            desc = "Dismiss All";
+          };
+        }
+        {
+          key = "<c-f>";
           action = ''
             function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end
           '';
           lua = true;
-          silent = true;
-          expr = true;
-          desc = "Scroll forward";
-        };
-        normalVisualOp."<c-b>" = {
+          options = {
+            desc = "Scroll forward";
+            silent = true;
+            expr = true;
+          };
+        }
+        {
+          key = "<c-b>";
           action = ''function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end
           '';
           lua = true;
-          silent = true;
-          expr = true;
-          desc = "Scroll backward";
-        };
+          options = {
+            desc = "Scroll backward";
+            silent = true;
+            expr = true;
+          };
+        }
         # }}}
         # file explorer {{{
-        normal."<leader>fe" = {
+        {
+          mode = "n";
+          key = "<leader>fe";
           action = ''
             function()
               require("neo-tree.command").execute({
@@ -390,32 +705,52 @@ in
             end
           '';
           lua = true;
-          desc = "Explorer NeoTree (root dir)";
-        };
-        normal."<leader>fE" = {
+          options = {
+            desc = "Explorer NeoTree (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>fE";
           action = ''
             function() require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() }) end'';
           lua = true;
-          desc = "Explorer NeoTree (cwd)";
-        };
-        normal."<leader>e" = {
+          options = {
+            desc = "Explorer NeoTree (cwd)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>e";
           action = "<leader>fe";
-          desc = "Explorer NeoTree (root dir)";
-          remap = true;
-        };
-        normal."<leader>E" = {
+          options = {
+            desc = "Explorer NeoTree (root dir)";
+            remap = true;
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>E";
           action = "<leader>fE";
-          desc = "Explorer NeoTree (cwd)";
-          remap = true;
-        };
+          options = {
+            desc = "Explorer NeoTree (cwd)";
+            remap = true;
+          };
+        }
         # }}}
         # Telescope {{{
-        normal."<leader>," = {
+        {
+          mode = "n";
+          key = "<leader>,";
           action = ''function() require("telescope.builtin").buffers({ show_all_buffers = true }) end'';
           lua = true;
-          desc = "Switch Buffer";
-        };
-        normal."<leader>/" = {
+          options = {
+            desc = "Switch Buffer";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>/";
           action = ''
             function()
               require("telescope.builtin").live_grep({
@@ -423,13 +758,21 @@ in
               })
             end'';
           lua = true;
-          desc = "Grep (root dir)";
-        };
-        normal."<leader>:" = {
+          options = {
+            desc = "Grep (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>:";
           action = "<cmd>Telescope command_history<cr>";
-          desc = "Command History";
-        };
-        normal."<leader><space>" = {
+          options = {
+            desc = "Command History";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader><space>";
           action = ''
             function()
               require("telescope.builtin").find_files({
@@ -437,79 +780,139 @@ in
               })
             end'';
           lua = true;
-          desc = "Find files (root dir)";
-        };
-        normal."<leader>fb" = {
+          options = {
+            desc = "Find files (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>fb";
           action = ''require("telescope.builtin").buffers'';
           lua = true;
-          desc = "Buffers";
-        };
-        normal."<leader>ff" = {
+          options = {
+            desc = "Buffers";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ff";
           action = ''<leader><space>'';
-          remap = true;
-          desc = "Find files (root dir)";
-        };
-        normal."<leader>fF" = {
+          options = {
+            remap = true;
+            desc = "Find files (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>fF";
           action = ''function() require("telescope.builtin").find_files({ cwd = vim.loop.cwd() }) end'';
           lua = true;
-          desc = "Find Files (cwd)";
-        };
-        normal."<leader>fr" = {
+          options = {
+            desc = "Find Files (cwd)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>fr";
           action = ''require("telescope.builtin").oldfiles'';
           lua = true;
-          desc = "Recent Files";
-        };
-        normal."<leader>fR" = {
+          options = {
+            desc = "Recent Files";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>fR";
           action = ''function() require("telescope.builtin").oldfiles({ cwd = vim.loop.cwd() }) end'';
           lua = true;
-          desc = "Recent Files (cwd)";
-        };
-        normal."<leader>gc" = {
+          options = {
+            desc = "Recent Files (cwd)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>gc";
           action = ''require("telescope.builtin").git_commits'';
           lua = true;
-          desc = "Git Commits";
-        };
-        normal."<leader>gs" = {
+          options = {
+            desc = "Git Commits";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>gs";
           action = ''require("telescope.builtin").git_status'';
           lua = true;
-          desc = "Git Status";
-        };
-        normal."<leader>sa" = {
+          options = {
+            desc = "Git Status";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sa";
           action = ''require("telescope.builtin").autocommands'';
           lua = true;
-          desc = "Auto Commands";
-        };
-        normal."<leader>sb" = {
+          options = {
+            desc = "Auto Commands";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sb";
           action = ''require("telescope.builtin").current_buffer_fuzzy_find'';
           lua = true;
-          desc = "Buffer";
-        };
-        normal."<leader>sc" = {
+          options = {
+            desc = "Buffer";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sc";
           action = ''require("telescope.builtin").command_history'';
           lua = true;
-          desc = "Command History";
-        };
-        normal."<leader>sC" = {
+          options = {
+            desc = "Command History";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sC";
           action = ''require("telescope.builtin").commands'';
           lua = true;
-          desc = "Commands";
-        };
-        normal."<leader>sd" = {
+          options = {
+            desc = "Commands";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sd";
           action = ''function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end'';
           lua = true;
-          desc = "Document Diagnostics";
-        };
-        normal."<leader>sD" = {
+          options = {
+            desc = "Document Diagnostics";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sD";
           action = ''require("telescope.builtin").diagnostics'';
           lua = true;
-          desc = "Workspace Diagnostics";
-        };
-        normal."<leader>sg" = {
+          options = {
+            desc = "Workspace Diagnostics";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sg";
           action = "<leader>/";
-          remap = true;
-          desc = "Grep (root dir)";
-        };
-        normal."<leader>sG" = {
+          options = {
+            remap = true;
+            desc = "Grep (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sG";
           action = ''
             function()
               require("telescope.builtin").live_grep({
@@ -517,44 +920,76 @@ in
               })
             end'';
           lua = true;
-          desc = "Grep (cwd)";
-        };
-        normal."<leader>sh" = {
+          options = {
+            desc = "Grep (cwd)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sh";
           action = ''require("telescope.builtin").help_tags'';
           lua = true;
-          desc = "Help Pages";
-        };
-        normal."<leader>sH" = {
+          options = {
+            desc = "Help Pages";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sH";
           action = ''require("telescope.builtin").highlights'';
           lua = true;
-          desc = "Search Highlights";
-        };
-        normal."<leader>sk" = {
+          options = {
+            desc = "Search Highlights";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sk";
           action = ''require("telescope.builtin").keymaps'';
           lua = true;
-          desc = "Key Maps";
-        };
-        normal."<leader>sM" = {
+          options = {
+            desc = "Key Maps";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sM";
           action = ''require("telescope.builtin").man_pages'';
           lua = true;
-          desc = "Man Pages";
-        };
-        normal."<leader>sm" = {
+          options = {
+            desc = "Man Pages";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sm";
           action = ''require("telescope.builtin").marks'';
           lua = true;
-          desc = "Jump to Mark";
-        };
-        normal."<leader>so" = {
+          options = {
+            desc = "Jump to Mark";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>so";
           action = ''require("telescope.builtin").vim_options'';
           lua = true;
-          desc = "Options";
-        };
-        normal."<leader>sR" = {
+          options = {
+            desc = "Options";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sR";
           action = ''require("telescope.builtin").resume'';
           lua = true;
-          desc = "Resume";
-        };
-        normal."<leader>sw" = {
+          options = {
+            desc = "Resume";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sw";
           action = ''
             function()
               require("telescope.builtin").grep_string({
@@ -562,42 +997,70 @@ in
               })
             end'';
           lua = true;
-          desc = "Word (root dir)";
-        };
-        normal."<leader>sW" = {
+          options = {
+            desc = "Word (root dir)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>sW";
           action = ''function() require("telescope.builtin").grep_string({ cwd = vim.loop.cwd() }) end'';
           lua = true;
-          desc = "Word (cwd)";
-        };
-        normal."<leader>uC" = {
+          options = {
+            desc = "Word (cwd)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>uC";
           action = ''
             function() require("telescope.builtin").colorscheme({ enable_preview = true }) end'';
           lua = true;
-          desc = "Colourscheme";
-        };
+          options = {
+            desc = "Colourscheme";
+          };
+        }
         # }}}
         # Trouble {{{
-        normal."<leader>xx" = {
+        {
+          mode = "n";
+          key = "<leader>xx";
           action = ''function() require("trouble").open("document_diagnostics") end'';
           lua = true;
-          desc = "Document Diagnostic (Trouble)";
-        };
-        normal."<leader>xX" = {
+          options = {
+            desc = "Document Diagnostic (Trouble)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>xX";
           action = ''function() require("trouble").open("workspace_diagnostics") end'';
           lua = true;
-          desc = "Document Diagnostic (Trouble)";
-        };
-        normal."<leader>xL" = {
+          options = {
+            desc = "Document Diagnostic (Trouble)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>xL";
           action = ''function() require("trouble").open("loclist") end'';
           lua = true;
-          desc = "Location List (Trouble)";
-        };
-        normal."<leader>xQ" = {
+          options = {
+            desc = "Location List (Trouble)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>xQ";
           action = ''function() require("trouble").open("quickfix") end'';
           lua = true;
-          desc = "Quickfix List (Trouble)";
-        };
-        normal."[q" = {
+          options = {
+            desc = "Quickfix List (Trouble)";
+          };
+        }
+        {
+          mode = "n";
+          key = "[q";
           action = ''
             function()
               local trouble = require("trouble")
@@ -608,9 +1071,13 @@ in
               end
             end'';
           lua = true;
-          desc = "Previous Trouble/Quickfix item";
-        };
-        normal."]q" = {
+          options = {
+            desc = "Previous Trouble/Quickfix item";
+          };
+        }
+        {
+          mode = "n";
+          key = "]q";
           action = ''
             function()
               local trouble = require("trouble")
@@ -621,10 +1088,12 @@ in
               end
             end'';
           lua = true;
-          desc = "Next Trouble/Quickfix item";
-        };
+          options = {
+            desc = "Next Trouble/Quickfix item";
+          };
+        }
         # }}}
-      };
+      ];
       plugins = {
         notify = {
           enable = true;
@@ -636,8 +1105,12 @@ in
         };
         indent-blankline = {
           enable = true;
-          char = "│";
-          filetypeExclude = [ "help" "alpha" "dashboard" "neo-tree" "Trouble" "lazy" ];
+          indent = {
+            char = "│";
+          };
+          exclude = {
+            filetypes = [ "help" "alpha" "dashboard" "neo-tree" "Trouble" "lazy" ];
+          };
         };
         noice = {
           enable = true;
@@ -654,13 +1127,13 @@ in
             long_message_to_split = true;
             inc_rename = true;
           };
-          routes = {
+          routes = [{
             filter = {
               event = "msg_show";
               find = "%d+L, %d+B";
             };
             view = "mini";
-          };
+          }];
         };
         telescope = {
           enable = true;
@@ -753,11 +1226,33 @@ in
               client.server_capabilities.hoverProvider = false
             end
             require("lazyvim.plugins.lsp.keymaps").on_attach(client, bufnr)
-            require("lazyvim.plugins.lsp.format").on_attach(client, bufnr)
-            vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.plugins.lsp.format").format, { buffer = bufnr; desc = "Format" })
+            -- require("lazyvim.plugins.lsp.format").on_attach(client, bufnr)
+            -- vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.plugins.lsp.format").format, { buffer = bufnr; desc = "Format" })
           '';
+          keymaps = {
+            lspBuf = {
+              # TODO: cannot use function() for action
+              "gd" = {
+                action = "definition";
+                desc = "Goto Definition";
+              };
+              "gr" = { action = "references"; desc = "References"; };
+              "gD" = { action = "declaration"; desc = "Goto Declaration"; };
+              # "gI" = "implementations";
+              # "gy" = "type_definitions";
+              "K" = { action = "hover"; desc = "Hover"; };
+              "gK" = {
+                action = "signature_help";
+                desc = "Signature Help";
+              };
+              "<leader>ca" = {
+                action = "code_action";
+                desc = "Code Action";
+              };
+            };
+          };
         };
-        null-ls = {
+        none-ls = {
           enable = true;
           sources.formatting = {
             black = {
@@ -784,6 +1279,11 @@ in
                 behavior = cmp.ConfirmBehavior.Replace,
                 select = true,
               })'';
+            "<C-CR" = ''
+              function(fallback)
+                cmp.abort()
+                fallback()
+              end'';
           };
           sources = [
             { name = "nvim_lsp"; }

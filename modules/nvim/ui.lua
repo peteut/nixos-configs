@@ -5,14 +5,18 @@ require("mini.bufremove").setup()
 -- bufferline {{{
 require("bufferline").setup({
   options = {
-    close_command = function(n) require("mini.bufremove").delete(n, false) end,
-    right_mouse_command = function(n) require("mini.bufremove").delete(n, false) end,
+    close_command = function(n)
+      require("mini.bufremove").delete(n, false)
+    end,
+    right_mouse_command = function(n)
+      require("mini.bufremove").delete(n, false)
+    end,
     diagnostics = "nvim_lsp",
     always_show_bufferline = false,
     diagnostics_indicator = function(_, _, diag)
       local icons = require("lazyvim.config").icons.diagnostics
       local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-      .. (diag.warning and icons.Warn .. diag.warning or "")
+        .. (diag.warning and icons.Warn .. diag.warning or "")
       return vim.trim(ret)
     end,
     offsets = {
@@ -29,7 +33,6 @@ require("bufferline").setup({
 -- statusline {{{
 require("lualine").setup((function()
   local icons = require("lazyvim.config").icons
-  local Util = require("lazyvim.util")
 
   return {
     options = {
@@ -63,19 +66,16 @@ require("lualine").setup((function()
         {
           function() return require("noice").api.status.command.get() end,
           cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-          color = Util.fg("Statement"),
         },
         -- stylua: ignore
         {
           function() return require("noice").api.status.mode.get() end,
           cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-          color = Util.fg("Constant"),
         },
         -- stylua: ignore
         {
           function() return "  " .. require("dap").status() end,
           cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
-          color = Util.fg("Debug"),
         },
         {
           "diff",
@@ -113,8 +113,7 @@ require("mini.indentscope").setup((function()
     symbol = "│",
     options = { try_as_border = true },
   }
-end
-)())
+end)())
 -- }}}
 -- icons {{{
 require("nvim-web-devicons").setup()

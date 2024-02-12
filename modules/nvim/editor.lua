@@ -40,6 +40,5 @@ require("neo-tree").setup((function()
       })
     end,
   }
-end
-)())
+end)())
 -- }}}

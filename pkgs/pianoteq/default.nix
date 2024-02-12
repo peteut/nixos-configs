@@ -22,7 +22,7 @@ let
   # `nix hash file pianoteq_stage_linux_v673.7z`.
   src = requireFile {
     name = binName;
-    message = "Download the file from: https://www.modartt.com/download?file=${binName} and add it to the nix store manually: nix-store --add-fixed sha256 ./${binName}";
+    message = "Download the file from: https://www.modartt.com/download?file=${binName} and add it to the nix store manually: nix store add-file ./${binName}";
     inherit hash;
   };
   archDir = "x86-64bit";
