@@ -37,6 +37,7 @@ in
           coding = builtins.readFile ./nvim/coding.lua;
           ui = builtins.readFile ./nvim/ui.lua;
           editor = builtins.readFile ./nvim/editor.lua;
+          lsp-keymaps = builtins.readFile ./nvim/plugins/lsp/keymaps.lua;
         in
         ''
           -- coding {{{
@@ -47,6 +48,11 @@ in
           -- }}}
           -- editor {{{
           ${editor}
+          -- }}}
+          -- plugins {{{
+          -- lsp {{{
+          ${lsp-keymaps}
+          -- }}}
           -- }}}
         '';
       colorschemes.nord = {
