@@ -33,7 +33,6 @@ require("bufferline").setup({
 -- statusline {{{
 require("lualine").setup((function()
   local icons = require("lazyvim.config").icons
-  local Util = require("lazyvim.util")
 
   return {
     options = {
@@ -67,19 +66,16 @@ require("lualine").setup((function()
         {
           function() return require("noice").api.status.command.get() end,
           cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-          color = Util.fg("Statement"),
         },
         -- stylua: ignore
         {
           function() return require("noice").api.status.mode.get() end,
           cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-          color = Util.fg("Constant"),
         },
         -- stylua: ignore
         {
           function() return "  " .. require("dap").status() end,
           cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
-          color = Util.fg("Debug"),
         },
         {
           "diff",
