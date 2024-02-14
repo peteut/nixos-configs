@@ -99,15 +99,11 @@ in
       '';
       extraConfigLua =
         let
-          coding = builtins.readFile ./nvim/coding.lua;
           ui = builtins.readFile ./nvim/ui.lua;
           editor = builtins.readFile ./nvim/editor.lua;
           # lsp-keymaps = builtins.readFile ./nvim/plugins/lsp/keymaps.lua;
         in
         ''
-          -- coding {{{
-          ${coding}
-          -- }}}
           -- ui {{{
           ${ui}
           -- }}}
@@ -1300,14 +1296,14 @@ in
             end
           '';
         };
-        # mini = {
-        #   enable = true;
-        #   modules = {
-        #     bufremove = { };
-        #     pairs = { };
-        #     comment = { };
-        #   };
-        # };
+        mini = {
+          enable = true;
+          modules = {
+            pairs = { };
+            comment = { };
+            bufremove = { };
+          };
+        };
       };
       extraPackages = builtins.attrValues {
         inherit (pkgs)
@@ -1322,7 +1318,6 @@ in
           lazy-nvim
           vim-eunuch
           dressing-nvim
-          mini-nvim
           noice-nvim
           LazyVim
           bufferline-nvim

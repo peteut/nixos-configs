@@ -1,7 +1,3 @@
--- bufremove {{{
-require("mini.bufremove").setup()
--- }}}
-
 -- bufferline {{{
 require("bufferline").setup({
   options = {
