@@ -101,7 +101,6 @@ in
         let
           ui = builtins.readFile ./nvim/ui.lua;
           editor = builtins.readFile ./nvim/editor.lua;
-          # lsp-keymaps = builtins.readFile ./nvim/plugins/lsp/keymaps.lua;
         in
         ''
           -- ui {{{
