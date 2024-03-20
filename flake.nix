@@ -118,16 +118,20 @@
           activateArm = deploy-rs.lib.${aarch64-linux}.activate;
           inherit (deploy-rs.lib.${x86_64-linux}) activate;
           cfg = self.nixosConfigurations;
+          system = s: s // {
+            sshUser = "alain";
+            user = "root";
+            magicRollback = false;
+            interactiveSudo = true;
+            fastConnection = true;
+          };
         in
         {
           rpi4 = {
             hostname = tailscaleHostname "rpi4";
             profiles = {
-              system = {
+              system = system {
                 path = activateArm.nixos cfg.rpi4;
-                sshUser = "alain";
-                user = "root";
-                sshOpts = [ "-t" ];
                 magicRollback = false;
                 autoRollback = true;
                 fastConnection = true;
@@ -137,11 +141,8 @@
           x1 = {
             hostname = "x1";
             profiles = {
-              system = {
+              system = system {
                 path = activate.nixos cfg.x1;
-                sshUser = "alain";
-                user = "root";
-                sshOpts = [ "-t" ];
                 magicRollback = false;
                 autoRollback = true;
                 fastConnection = true;
@@ -151,13 +152,10 @@
           desktop = {
             hostname = tailscaleHostname "desktop";
             profiles = {
-              system = {
+              system = system {
                 path = activate.nixos cfg.desktop;
-                sshUser = "alain";
-                user = "root";
-                sshOpts = [ "-t" ];
                 magicRollback = false;
-                autoRollback = true;
+                autoRollback = false;
                 fastConnection = true;
                 remoteBuild = true;
               };
@@ -166,13 +164,10 @@
           ws-10 = {
             hostname = tailscaleHostname "ws-10";
             profiles = {
-              system = {
+              system = system {
                 path = activate.nixos cfg.ws-10;
-                sshUser = "alain";
-                user = "root";
-                sshOpts = [ "-t" ];
                 magicRollback = false;
-                autoRollback = true;
+                autoRollback = false;
                 fastConnection = true;
                 remoteBuild = true;
               };

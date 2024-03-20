@@ -84,7 +84,7 @@ in
         local opt = vim.opt
         opt.shortmess:append({ W = true, I = true, c = true, C = true })
         if vim.fn.has("nvim-0.10") == 1 then
-          opt.smoothscroll = true
+        opt.smoothscroll = true
         end
         vim.o.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
         -- Folding
@@ -100,14 +100,10 @@ in
       extraConfigLua =
         let
           ui = builtins.readFile ./nvim/ui.lua;
-          editor = builtins.readFile ./nvim/editor.lua;
         in
         ''
           -- ui {{{
           ${ui}
-          -- }}}
-          -- editor {{{
-          ${editor}
           -- }}}
         '';
       colorschemes.nord = {
@@ -270,7 +266,47 @@ in
           };
         }
         # }}}
-        # mini.bufremove {{{
+        # Move lines {{{
+        {
+          mode = "n";
+          key = "<A-j>";
+          action = "<cmd>m .+1<cr>==";
+          options = {
+            desc = "Move down";
+          };
+        }
+        {
+          mode = "n";
+          key = "<A-k>";
+          action = "<cmd>m .-2<cr>==";
+          options = { desc = "Move up"; };
+        }
+        {
+          mode = "i";
+          key = "<A-j>";
+          action = "<esc><cmd>m .+1<cr>==gi";
+          options = { desc = "Move down"; };
+        }
+        {
+          mode = "i";
+          key = "<A-k>";
+          action = "<esc><cmd>m .-2<cr>==gi";
+          options = { desc = "Move up"; };
+        }
+        {
+          mode = "v";
+          key = "<A-j>";
+          action = ":m '>+1<cr>gv=gv";
+          options = { desc = "Move down"; };
+        }
+        {
+          mode = "v";
+          key = "<A-k>";
+          action = ":m '<-2<cr>gv=gv";
+          options = { desc = "Move up"; };
+        }
+        # }}}
+        # buffer remove {{{
         {
           mode = "n";
           key = "<leader>bd";
@@ -679,7 +715,7 @@ in
         {
           key = "<c-b>";
           action = ''function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end
-          '';
+            '';
           lua = true;
           options = {
             desc = "Scroll backward";
@@ -694,9 +730,9 @@ in
           key = "<leader>fe";
           action = ''
             function()
-              require("neo-tree.command").execute({
-                toggle = true, dir = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
-              })
+            require("neo-tree.command").execute({
+              toggle = true, dir = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+            })
             end
           '';
           lua = true;
@@ -748,9 +784,9 @@ in
           key = "<leader>/";
           action = ''
             function()
-              require("telescope.builtin").live_grep({
-                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
-              })
+            require("telescope.builtin").live_grep({
+              cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+            })
             end'';
           lua = true;
           options = {
@@ -770,9 +806,9 @@ in
           key = "<leader><space>";
           action = ''
             function()
-              require("telescope.builtin").find_files({
-                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
-              })
+            require("telescope.builtin").find_files({
+              cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+            })
             end'';
           lua = true;
           options = {
@@ -910,9 +946,9 @@ in
           key = "<leader>sG";
           action = ''
             function()
-              require("telescope.builtin").live_grep({
-                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
-              })
+            require("telescope.builtin").live_grep({
+              cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+            })
             end'';
           lua = true;
           options = {
@@ -987,9 +1023,9 @@ in
           key = "<leader>sw";
           action = ''
             function()
-              require("telescope.builtin").grep_string({
-                cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
-              })
+            require("telescope.builtin").grep_string({
+              cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
+            })
             end'';
           lua = true;
           options = {
@@ -1058,12 +1094,12 @@ in
           key = "[q";
           action = ''
             function()
-              local trouble = require("trouble")
-              if trouble.is_open() then
-                trouble.previous({ skip_groups = true, jump = true })
-              else
-                vim.cmd.cprev()
-              end
+            local trouble = require("trouble")
+            if trouble.is_open() then
+            trouble.previous({ skip_groups = true, jump = true })
+            else
+            vim.cmd.cprev()
+            end
             end'';
           lua = true;
           options = {
@@ -1075,12 +1111,12 @@ in
           key = "]q";
           action = ''
             function()
-              local trouble = require("trouble")
-              if trouble.is_open() then
-                trouble.next({ skip_groups = true, jump = true })
-              else
-                vim.cmd.cnext()
-              end
+            local trouble = require("trouble")
+            if trouble.is_open() then
+            trouble.next({ skip_groups = true, jump = true })
+            else
+            vim.cmd.cnext()
+            end
             end'';
           lua = true;
           options = {
@@ -1220,9 +1256,7 @@ in
               -- disable hover in favor of Pyright
               client.server_capabilities.hoverProvider = false
             end
-            require("lazyvim.plugins.lsp.keymaps").on_attach(client, bufnr)
-            -- require("lazyvim.plugins.lsp.format").on_attach(client, bufnr)
-            -- vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.plugins.lsp.format").format, { buffer = bufnr; desc = "Format" })
+            vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.utils").format, { buffer = bufnr; desc = "Format" })
           '';
           keymaps = {
             lspBuf = {
@@ -1276,8 +1310,8 @@ in
               })'';
             "<C-CR" = ''
               function(fallback)
-                cmp.abort()
-                fallback()
+              cmp.abort()
+              fallback()
               end'';
           };
           sources = [
@@ -1287,11 +1321,11 @@ in
           ];
           formatting.format = ''
             function(_, item)
-              local icons = require("lazyvim.config").icons.kinds
-              if icons[item.kind] then
-                item.kind = icons[item.kind] .. item.kind
-              end
-              return item
+            local icons = require("lazyvim.config").icons.kinds
+            if icons[item.kind] then
+            item.kind = icons[item.kind] .. item.kind
+            end
+            return item
             end
           '';
         };
@@ -1301,6 +1335,76 @@ in
             pairs = { };
             comment = { };
             bufremove = { };
+            indentscope = {
+              symbol = "|";
+              options = { try_as_boarder = true; };
+            };
+            trailspace = { };
+          };
+        };
+        lualine = {
+          # WIP, migrate from ui.lua
+          enable = false;
+          extensions = [ "neo-tree" ];
+          globalstatus = true;
+          iconsEnabled = true;
+          disabledFiletypes.statusline = [ "dashboard" "alpha" ];
+          sections = {
+            lualine_a = [ "mode" ];
+            lualine_b = [ "branch" ];
+            lualine_c = [
+              "diagnostics"
+              {
+                name = "filetype";
+                padding = {
+                  left = 1;
+                  right = 0;
+                };
+                separator = {
+                  left = "";
+                  right = "";
+                };
+                extraConfig = {
+                  icon_only = true;
+                };
+              }
+              {
+                name = "filename";
+                extraConfig = {
+                  path = 1;
+                };
+              }
+              {
+                name = ''
+                  function() return require("nvim-navic").get_location() end
+                '';
+                extraConfig = {
+                  cond = ''
+                    function() return package.loaded["nvim-navic"] and require("nvim-navic").is_available() end
+                  '';
+                };
+              }
+            ];
+          };
+        };
+        neo-tree = {
+          enable = true;
+          enableGitStatus = true;
+          enableModifiedMarkers = true;
+          retainHiddenRootIndent = true;
+          filesystem = {
+            filteredItems = {
+              visible = true;
+            };
+            followCurrentFile.enabled = true;
+            hijackNetrwBehavior = "open_default";
+            useLibuvFileWatcher = true;
+          };
+          defaultComponentConfigs = {
+            indent = {
+              expanderCollapsed = "";
+              expanderExpanded = "";
+            };
           };
         };
       };
@@ -1323,7 +1427,6 @@ in
           lualine-nvim
           nvim-web-devicons
           nui-nvim
-          neo-tree-nvim
           ;
       };
     };
