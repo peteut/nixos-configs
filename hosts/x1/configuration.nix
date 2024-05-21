@@ -290,6 +290,7 @@ in
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       inherit (pkgs)
         gnumake
+        git
         google-chrome
         tailscale
         direnv
@@ -328,7 +329,10 @@ in
     };
   };
 
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    extraUpFlags = [ "--ssh" ];
+  };
   services.fprintd.enable = true;
   services.onedrive.enable = true;
   services.printing.enable = true;

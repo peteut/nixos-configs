@@ -88,6 +88,7 @@ in
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
+    extraUpFlags = [ "--ssh" ];
   };
 
   # Open ports in the firewall.

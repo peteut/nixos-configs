@@ -14,7 +14,10 @@
     };
   };
 
-  services.tailscale = { enable = true; };
+  services.tailscale = {
+    enable = true;
+    extraUpFlags = [ "--ssh" ];
+  };
   networking.firewall = {
     enable = true;
     checkReversePath = "loose";
