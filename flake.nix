@@ -11,7 +11,6 @@
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs-stable.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.gitignore.follows = "gitignore";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -29,7 +28,6 @@
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.utils.follows = "flake-utils";
     };
     nixvim = {
       url = "github:nix-community/nixvim/nixos-23.11";
@@ -134,7 +132,7 @@
                 path = activateArm.nixos cfg.rpi4;
                 magicRollback = false;
                 autoRollback = true;
-                fastConnection = true;
+                fastConnection = false;
               };
             };
           };
@@ -157,7 +155,7 @@
                 magicRollback = false;
                 autoRollback = false;
                 fastConnection = true;
-                remoteBuild = true;
+                remoteBuild = false;
               };
             };
           };
@@ -168,8 +166,8 @@
                 path = activate.nixos cfg.ws-10;
                 magicRollback = false;
                 autoRollback = false;
-                fastConnection = true;
-                remoteBuild = true;
+                fastConnection = false;
+                remoteBuild = false;
               };
             };
           };
