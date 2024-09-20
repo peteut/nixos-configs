@@ -51,11 +51,11 @@ in
   };
 
   services.udev.extraRules = ''
-    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", \
-     ATTRS{serial}=="210299AD07E3", \
-     MODE="0666", \
-     SYMLINK+="jtag-hs3_%n" \
-     RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
+    # SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", \
+    #  ATTRS{serial}=="210299AD07E3", \
+    #  MODE="0666", \
+    #  SYMLINK+="jtag-hs3_%n" \
+    #  RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
     # STMicroelectronics STLINK-V3
     ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", MODE="0666", \
       TAG+="uaccess"
@@ -71,10 +71,10 @@ in
     # RIOT riotboot DFU bootloader: https://pid.codes/1209/7D02/
     ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7d02", MODE="0666", \
       TAG+="uaccess"
-    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", \
-      MODE="0666", \
-      SYMLINK+="ftdi_%n" \
-      RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
+    # SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", \
+    #   MODE="0666", \
+    #   SYMLINK+="ftdi_%n" \
+    #   RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
   '';
 
   musnix = {

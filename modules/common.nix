@@ -16,7 +16,10 @@
       dates = "weekly";
       options = "--delete-older-than 7d";
     };
-    settings.trusted-public-keys = [ (builtins.readFile ../nix-pub.pem) ];
+    settings = {
+      trusted-public-keys = [ (builtins.readFile ../nix-pub.pem) ];
+      trusted-users = [ "root" "alain" ];
+    };
     registry.nixpkgs.flake = nixpkgs;
 
     package = pkgs.nixFlakes;
