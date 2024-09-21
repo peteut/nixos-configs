@@ -15,6 +15,9 @@ in
         mapleader = ",";
         maplocalleader = ",";
         autoformat = true;
+        autoformat_autoindent = false;
+        autoformat_retab = false;
+        autoformat_remove_trailing_spaces = false;
         markdown_recommended_stle = 0;
         # LazyVim root dir detection
         # Each entry can be:
@@ -23,7 +26,7 @@ in
         # * a function with signature `function(buf) -> string|string[]`
         root_spec = [ "lsp" [ ".git" "lua" ] "cwd" ];
       };
-      options = {
+      opts = {
         # Turn backup off, since most stuff is in SVN, git etc. anyway...
         backup = false;
         wb = true;
@@ -70,8 +73,7 @@ in
         fillchars = {
           foldopen = "";
           foldclose = "";
-          # fold = "⸱";
-          fold = " ";
+          fold = "⸱";
           foldsep = " ";
           diff = "╱";
           eob = " ";
@@ -89,8 +91,8 @@ in
         vim.o.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
         -- Folding
         opt.foldlevel = 99
-        opt.foldtext = "v:lua.require'lazyvim.util'.ui.foldtext()"
-        opt.statuscolumn = [[%!v:lua.require'lazyvim.util'.ui.statuscolumn()]]
+        -- opt.foldtext = "v:lua.require'lazyvim.util'.ui.foldtext()"
+        -- opt.statuscolumn = [[%!v:lua.require'lazyvim.util'.ui.statuscolumn()]]
         opt.foldmethod = "indent"
         -- }}}
         -- regex {{{
@@ -108,9 +110,11 @@ in
         '';
       colorschemes.nord = {
         enable = true;
-        contrast = true;
-        cursorline_transparent = true;
-        italic = true;
+        # cursorline_transparent = true;
+        settings = {
+          italic = true;
+          contrast = true;
+        };
       };
       globals = {
         neo_tree_remove_legacy_commands = true;
@@ -232,8 +236,7 @@ in
         {
           mode = "n";
           key = "<C-Up>";
-          action = ''function() vim.api.nvim_win_set_height(0, vim.api.nvim_win_get_height(0) + 2) end'';
-          lua = true;
+          action.__raw = ''function() vim.api.nvim_win_set_height(0, vim.api.nvim_win_get_height(0) + 2) end'';
           options = {
             desc = "Increase window height";
           };
@@ -241,8 +244,7 @@ in
         {
           mode = "n";
           key = "<C-Down>";
-          action = ''function() vim.api.nvim_win_set_height(0,  vim.api.nvim_win_get_height(0) - 2) end'';
-          lua = true;
+          action.__raw = ''function() vim.api.nvim_win_set_height(0,  vim.api.nvim_win_get_height(0) - 2) end'';
           options = {
             desc = "Decrease window height";
           };
@@ -250,8 +252,7 @@ in
         {
           mode = "n";
           key = "<C-Left>";
-          action = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) - 2) end'';
-          lua = true;
+          action.__raw = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) - 2) end'';
           options = {
             desc = "Decrease window width";
           };
@@ -259,8 +260,7 @@ in
         {
           mode = "n";
           key = "<C-Right>";
-          action = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) + 2) end'';
-          lua = true;
+          action.__raw = ''function() vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) + 2) end'';
           options = {
             desc = "Increase window width";
           };
@@ -310,7 +310,7 @@ in
         {
           mode = "n";
           key = "<leader>bd";
-          action = ''
+          action.__raw = ''
             function()
               local bd = require("mini.bufremove").delete
               if vim.bo.modified then
@@ -325,7 +325,6 @@ in
                 bd(0)
               end
             end'';
-          lua = true;
           options = {
             desc = "Delete Buffer";
           };
@@ -333,8 +332,7 @@ in
         {
           mode = "n";
           key = "<leader>bD";
-          action = ''function() require("mini.bufremove").delete(0, true) end'';
-          lua = true;
+          action.__raw = ''function() require("mini.bufremove").delete(0, true) end'';
           options = {
             desc = "Delete Buffer (Force)";
           };
@@ -658,8 +656,7 @@ in
         {
           mode = "c";
           key = "<S-Enter>";
-          action = ''function() require("noice").redirect(vim.fn.getcmdline()) end'';
-          lua = true;
+          action.__raw = ''function() require("noice").redirect(vim.fn.getcmdline()) end'';
           options = {
             desc = "Redirect Cmdline";
           };
@@ -667,8 +664,7 @@ in
         {
           mode = "n";
           key = "<leader>snl";
-          action = ''function() require("noice").cmd("last") end'';
-          lua = true;
+          action.__raw = ''function() require("noice").cmd("last") end'';
           options = {
             desc = "Noice Last Message";
           };
@@ -676,8 +672,7 @@ in
         {
           mode = "n";
           key = "<leader>snh";
-          action = ''function() require("noice").cmd("history") end'';
-          lua = true;
+          action.__raw = ''function() require("noice").cmd("history") end'';
           options = {
             desc = "Noice History";
           };
@@ -685,8 +680,7 @@ in
         {
           mode = "n";
           key = "<leader>sna";
-          action = ''function() require("noice").cmd("all") end'';
-          lua = true;
+          action.__raw = ''function() require("noice").cmd("all") end'';
           options = {
             desc = "Noice All";
           };
@@ -694,18 +688,16 @@ in
         {
           mode = "n";
           key = "<leader>snd";
-          action = ''function() require("noice").cmd("dismiss") end'';
-          lua = true;
+          action.__raw = ''function() require("noice").cmd("dismiss") end'';
           options = {
             desc = "Dismiss All";
           };
         }
         {
           key = "<c-f>";
-          action = ''
+          action.__raw = ''
             function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end
           '';
-          lua = true;
           options = {
             desc = "Scroll forward";
             silent = true;
@@ -714,9 +706,8 @@ in
         }
         {
           key = "<c-b>";
-          action = ''function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end
+          action.__raw = ''function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end
             '';
-          lua = true;
           options = {
             desc = "Scroll backward";
             silent = true;
@@ -728,14 +719,13 @@ in
         {
           mode = "n";
           key = "<leader>fe";
-          action = ''
+          action.__raw = ''
             function()
             require("neo-tree.command").execute({
               toggle = true, dir = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
             })
             end
           '';
-          lua = true;
           options = {
             desc = "Explorer NeoTree (root dir)";
           };
@@ -743,9 +733,8 @@ in
         {
           mode = "n";
           key = "<leader>fE";
-          action = ''
+          action.__raw = ''
             function() require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() }) end'';
-          lua = true;
           options = {
             desc = "Explorer NeoTree (cwd)";
           };
@@ -773,8 +762,7 @@ in
         {
           mode = "n";
           key = "<leader>,";
-          action = ''function() require("telescope.builtin").buffers({ show_all_buffers = true }) end'';
-          lua = true;
+          action.__raw = ''function() require("telescope.builtin").buffers({ show_all_buffers = true }) end'';
           options = {
             desc = "Switch Buffer";
           };
@@ -782,13 +770,12 @@ in
         {
           mode = "n";
           key = "<leader>/";
-          action = ''
+          action.__raw = ''
             function()
             require("telescope.builtin").live_grep({
               cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
             })
             end'';
-          lua = true;
           options = {
             desc = "Grep (root dir)";
           };
@@ -804,13 +791,12 @@ in
         {
           mode = "n";
           key = "<leader><space>";
-          action = ''
+          action.__raw = ''
             function()
             require("telescope.builtin").find_files({
               cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
             })
             end'';
-          lua = true;
           options = {
             desc = "Find files (root dir)";
           };
@@ -818,8 +804,7 @@ in
         {
           mode = "n";
           key = "<leader>fb";
-          action = ''require("telescope.builtin").buffers'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").buffers'';
           options = {
             desc = "Buffers";
           };
@@ -836,8 +821,7 @@ in
         {
           mode = "n";
           key = "<leader>fF";
-          action = ''function() require("telescope.builtin").find_files({ cwd = vim.loop.cwd() }) end'';
-          lua = true;
+          action.__raw = ''function() require("telescope.builtin").find_files({ cwd = vim.loop.cwd() }) end'';
           options = {
             desc = "Find Files (cwd)";
           };
@@ -845,8 +829,7 @@ in
         {
           mode = "n";
           key = "<leader>fr";
-          action = ''require("telescope.builtin").oldfiles'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").oldfiles'';
           options = {
             desc = "Recent Files";
           };
@@ -854,8 +837,7 @@ in
         {
           mode = "n";
           key = "<leader>fR";
-          action = ''function() require("telescope.builtin").oldfiles({ cwd = vim.loop.cwd() }) end'';
-          lua = true;
+          action.__raw = ''function() require("telescope.builtin").oldfiles({ cwd = vim.loop.cwd() }) end'';
           options = {
             desc = "Recent Files (cwd)";
           };
@@ -863,8 +845,7 @@ in
         {
           mode = "n";
           key = "<leader>gc";
-          action = ''require("telescope.builtin").git_commits'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").git_commits'';
           options = {
             desc = "Git Commits";
           };
@@ -872,8 +853,7 @@ in
         {
           mode = "n";
           key = "<leader>gs";
-          action = ''require("telescope.builtin").git_status'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").git_status'';
           options = {
             desc = "Git Status";
           };
@@ -881,8 +861,7 @@ in
         {
           mode = "n";
           key = "<leader>sa";
-          action = ''require("telescope.builtin").autocommands'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").autocommands'';
           options = {
             desc = "Auto Commands";
           };
@@ -890,8 +869,7 @@ in
         {
           mode = "n";
           key = "<leader>sb";
-          action = ''require("telescope.builtin").current_buffer_fuzzy_find'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").current_buffer_fuzzy_find'';
           options = {
             desc = "Buffer";
           };
@@ -899,8 +877,7 @@ in
         {
           mode = "n";
           key = "<leader>sc";
-          action = ''require("telescope.builtin").command_history'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").command_history'';
           options = {
             desc = "Command History";
           };
@@ -908,8 +885,7 @@ in
         {
           mode = "n";
           key = "<leader>sC";
-          action = ''require("telescope.builtin").commands'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").commands'';
           options = {
             desc = "Commands";
           };
@@ -917,8 +893,7 @@ in
         {
           mode = "n";
           key = "<leader>sd";
-          action = ''function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end'';
-          lua = true;
+          action.__raw = ''function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end'';
           options = {
             desc = "Document Diagnostics";
           };
@@ -926,8 +901,7 @@ in
         {
           mode = "n";
           key = "<leader>sD";
-          action = ''require("telescope.builtin").diagnostics'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").diagnostics'';
           options = {
             desc = "Workspace Diagnostics";
           };
@@ -944,13 +918,12 @@ in
         {
           mode = "n";
           key = "<leader>sG";
-          action = ''
+          action.__raw = ''
             function()
             require("telescope.builtin").live_grep({
               cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
             })
             end'';
-          lua = true;
           options = {
             desc = "Grep (cwd)";
           };
@@ -958,8 +931,7 @@ in
         {
           mode = "n";
           key = "<leader>sh";
-          action = ''require("telescope.builtin").help_tags'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").help_tags'';
           options = {
             desc = "Help Pages";
           };
@@ -967,8 +939,7 @@ in
         {
           mode = "n";
           key = "<leader>sH";
-          action = ''require("telescope.builtin").highlights'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").highlights'';
           options = {
             desc = "Search Highlights";
           };
@@ -976,8 +947,7 @@ in
         {
           mode = "n";
           key = "<leader>sk";
-          action = ''require("telescope.builtin").keymaps'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").keymaps'';
           options = {
             desc = "Key Maps";
           };
@@ -985,8 +955,7 @@ in
         {
           mode = "n";
           key = "<leader>sM";
-          action = ''require("telescope.builtin").man_pages'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").man_pages'';
           options = {
             desc = "Man Pages";
           };
@@ -994,8 +963,7 @@ in
         {
           mode = "n";
           key = "<leader>sm";
-          action = ''require("telescope.builtin").marks'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").marks'';
           options = {
             desc = "Jump to Mark";
           };
@@ -1003,8 +971,7 @@ in
         {
           mode = "n";
           key = "<leader>so";
-          action = ''require("telescope.builtin").vim_options'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").vim_options'';
           options = {
             desc = "Options";
           };
@@ -1012,8 +979,7 @@ in
         {
           mode = "n";
           key = "<leader>sR";
-          action = ''require("telescope.builtin").resume'';
-          lua = true;
+          action.__raw = ''require("telescope.builtin").resume'';
           options = {
             desc = "Resume";
           };
@@ -1021,13 +987,12 @@ in
         {
           mode = "n";
           key = "<leader>sw";
-          action = ''
+          action.__raw = ''
             function()
             require("telescope.builtin").grep_string({
               cwd = require("null-ls.utils").root_pattern(".git")(vim.loop.cwd())
             })
             end'';
-          lua = true;
           options = {
             desc = "Word (root dir)";
           };
@@ -1035,8 +1000,7 @@ in
         {
           mode = "n";
           key = "<leader>sW";
-          action = ''function() require("telescope.builtin").grep_string({ cwd = vim.loop.cwd() }) end'';
-          lua = true;
+          action.__raw = ''function() require("telescope.builtin").grep_string({ cwd = vim.loop.cwd() }) end'';
           options = {
             desc = "Word (cwd)";
           };
@@ -1044,9 +1008,8 @@ in
         {
           mode = "n";
           key = "<leader>uC";
-          action = ''
+          action.__raw = ''
             function() require("telescope.builtin").colorscheme({ enable_preview = true }) end'';
-          lua = true;
           options = {
             desc = "Colourscheme";
           };
@@ -1056,8 +1019,7 @@ in
         {
           mode = "n";
           key = "<leader>xx";
-          action = ''function() require("trouble").open("document_diagnostics") end'';
-          lua = true;
+          action.__raw = ''function() require("trouble").open("document_diagnostics") end'';
           options = {
             desc = "Document Diagnostic (Trouble)";
           };
@@ -1065,8 +1027,7 @@ in
         {
           mode = "n";
           key = "<leader>xX";
-          action = ''function() require("trouble").open("workspace_diagnostics") end'';
-          lua = true;
+          action.__raw = ''function() require("trouble").open("workspace_diagnostics") end'';
           options = {
             desc = "Document Diagnostic (Trouble)";
           };
@@ -1074,8 +1035,7 @@ in
         {
           mode = "n";
           key = "<leader>xL";
-          action = ''function() require("trouble").open("loclist") end'';
-          lua = true;
+          action.__raw = ''function() require("trouble").open("loclist") end'';
           options = {
             desc = "Location List (Trouble)";
           };
@@ -1083,8 +1043,7 @@ in
         {
           mode = "n";
           key = "<leader>xQ";
-          action = ''function() require("trouble").open("quickfix") end'';
-          lua = true;
+          action.__raw = ''function() require("trouble").open("quickfix") end'';
           options = {
             desc = "Quickfix List (Trouble)";
           };
@@ -1092,7 +1051,7 @@ in
         {
           mode = "n";
           key = "[q";
-          action = ''
+          action.__raw = ''
             function()
             local trouble = require("trouble")
             if trouble.is_open() then
@@ -1101,7 +1060,6 @@ in
             vim.cmd.cprev()
             end
             end'';
-          lua = true;
           options = {
             desc = "Previous Trouble/Quickfix item";
           };
@@ -1109,7 +1067,7 @@ in
         {
           mode = "n";
           key = "]q";
-          action = ''
+          action.__raw = ''
             function()
             local trouble = require("trouble")
             if trouble.is_open() then
@@ -1118,7 +1076,6 @@ in
             vim.cmd.cnext()
             end
             end'';
-          lua = true;
           options = {
             desc = "Next Trouble/Quickfix item";
           };
@@ -1136,11 +1093,13 @@ in
         };
         indent-blankline = {
           enable = true;
-          indent = {
-            char = "│";
-          };
-          exclude = {
-            filetypes = [ "help" "alpha" "dashboard" "neo-tree" "Trouble" "lazy" ];
+          settings = {
+            indent = {
+              char = "│";
+            };
+            exclude = {
+              filetypes = [ "help" "alpha" "dashboard" "neo-tree" "Trouble" "lazy" ];
+            };
           };
         };
         noice = {
@@ -1171,7 +1130,9 @@ in
         };
         trouble = {
           enable = true;
-          useDiagnosticSigns = true;
+          settings = {
+            use_diagnostic_signs = true;
+          };
         };
         which-key = {
           enable = true;
@@ -1230,7 +1191,7 @@ in
             clangd = {
               enable = true;
             };
-            nil_ls = {
+            nil-ls = {
               enable = true;
               rootDir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
               extraOptions = {
@@ -1281,6 +1242,12 @@ in
             };
           };
         };
+        # lsp-format = {
+        #   enable = true;
+        #   lspServersToEnable = [
+        #     "gopls"
+        #   ];
+        # };
         none-ls = {
           enable = true;
           sources.formatting = {
@@ -1293,41 +1260,43 @@ in
         cmp-nvim-lsp.enable = true;
         cmp-path.enable = true;
         cmp-buffer.enable = true;
-        nvim-cmp = {
+        cmp = {
           enable = true;
-          mapping = {
-            "<C-n>" = ''cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert })'';
-            "<C-p>" = ''cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert })'';
-            "<C-b>" = ''cmp.mapping.scroll_docs(-4)'';
-            "<C-f>" = ''cmp.mapping.scroll_docs(4)'';
-            "<C-Space>" = ''cmp.mapping.complete()'';
-            "<C-e>" = ''cmp.mapping.abort()'';
-            "<CR>" = ''cmp.mapping.confirm({ select = true })'';
-            "<S-CR>" = ''
-              cmp.mapping.confirm({
-                behavior = cmp.ConfirmBehavior.Replace,
-                select = true,
-              })'';
-            "<C-CR" = ''
-              function(fallback)
-              cmp.abort()
-              fallback()
-              end'';
+          settings = {
+            mapping = {
+              "<C-n>" = ''cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert })'';
+              "<C-p>" = ''cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert })'';
+              "<C-b>" = ''cmp.mapping.scroll_docs(-4)'';
+              "<C-f>" = ''cmp.mapping.scroll_docs(4)'';
+              "<C-Space>" = ''cmp.mapping.complete()'';
+              "<C-e>" = ''cmp.mapping.abort()'';
+              "<CR>" = ''cmp.mapping.confirm({ select = true })'';
+              "<S-CR>" = ''
+                cmp.mapping.confirm({
+                  behavior = cmp.ConfirmBehavior.Replace,
+                  select = true,
+                })'';
+              "<C-CR" = ''
+                function(fallback)
+                cmp.abort()
+                fallback()
+                end'';
+            };
+            # sources = [
+            #   { name = "nvim_lsp"; }
+            #   { name = "buffer"; }
+            #   { name = "path"; }
+            # ];
+            formatting.format = ''
+              function(_, item)
+              local icons = require("lazyvim.config").icons.kinds
+              if icons[item.kind] then
+              item.kind = icons[item.kind] .. item.kind
+              end
+              return item
+              end
+            '';
           };
-          sources = [
-            { name = "nvim_lsp"; }
-            { name = "buffer"; }
-            { name = "path"; }
-          ];
-          formatting.format = ''
-            function(_, item)
-            local icons = require("lazyvim.config").icons.kinds
-            if icons[item.kind] then
-            item.kind = icons[item.kind] .. item.kind
-            end
-            return item
-            end
-          '';
         };
         mini = {
           enable = true;

@@ -115,7 +115,10 @@ in
       xfce.enable = true;
       xterm.enable = false;
     };
-    displayManager.defaultSession = "xfce";
+  };
+  services.displayManager = {
+    enable = true;
+    defaultSession = "xfce";
   };
   services.picom = {
     enable = true;
@@ -157,11 +160,7 @@ in
   };
   services.fwupd.enable = true;
   # Configure keymap in X11
-  services.xserver.layout = "ch";
-  # services.xserver.xkbOptions = {
-  #   "eurosign:e";
-  #   "caps:escape" # map caps to escape.
-  # };
+  services.xserver.xkb.layout = "ch";
 
   hardware.pulseaudio = {
     enable = false;
@@ -181,56 +180,59 @@ in
     jack.enable = true;
     pulse.enable = true;
     alsa.enable = true;
-  };
-  environment.etc =
-    let
-      json = pkgs.formats.json { };
-    in
-    {
-      "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
-        bluez_monitor.properties = {
-          ["bluez5.enable-sbc-xq"] = true,
-          ["bluez5.enable-msbc"] = true,
-          ["bluez5.enable-hw-volume"] = true,
-          ["bluez5.headset-roles"] = "[ hsp_hs hsp_ag hfp_hf hfp_ag ]"
-        }
-      '';
-      "pipewire/pipewire.d/91-null-sinks.conf".source = json.generate "91-null-sinks.conf" {
-        context.objects = [
+    extraConfig = {
+      pipewire."91-null-sinks" = {
+        "context.objects" = [
           {
             # A default dummy driver. This handles nodes marked with the "node.always-driver"
             # properyty when no other driver is currently active. JACK clients need this.
             factory = "spa-node-factory";
             args = {
-              factory.name = "support.node.driver";
-              node.name = "Dummy-Driver";
-              node.group = "pipewire.dummy";
-              priority.driver = 20000;
-            };
-          }
-          {
-            factory = "spa-node-factory";
-            args = {
-              factory.name = "support.node.driver";
-              node.name = "Freewheel-Driver";
-              node.freewheel = true;
-              node.group = "  pipewrite.freewheel";
-              priority.driver = 19000;
+              "factory.name" = "support.node.driver";
+              "node.name" = "Dummy-Driver";
+              "priority.driver" = 8000;
             };
           }
           {
             factory = "adapter";
             args = {
-              factory.name = "support.null-audio-sink";
-              node.name = "Main-Output-Proxy";
-              node.description = "Main Output";
-              media.class = "Audio/Sink";
-              audio.position = "FL,FR";
+              "factory.name" = "support.null-audio-sink";
+              "node.name" = "Main-Output-Proxy";
+              "node.description" = "Main Output";
+              "media.class" = "Audio/Sink";
+              "audio.position" = "FL,FR";
             };
           }
         ];
       };
+      pipewire-pulse."92-low-latency" = {
+        context-objects = [
+          {
+            name = "libpipewire-module-protocol-pulse";
+            args = {
+              pulse.min.req = "32/48000";
+              pulse.default.req = "32/48000";
+              pulse.max.req = "32/48000";
+              pulse.min.quantum = "32/48000";
+              pulse.max.quantum = "32/48000";
+            };
+          }
+        ];
+        stream.properties = {
+          node.latency = "32/48000";
+          resample.quality = 1;
+        };
+      };
     };
+    wireplumber.extraConfig.bluetoothEnhancements = {
+      "monitor.bluez.properties" = {
+        "bluez5.roles" = [ "a2dp_sink" "a2dp_source" "bap_sink" "bap_source" "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+        "bluez5.codecs" = [ "sbc" "sbc_xq" "aac" ];
+        "bluez5.enable-sbc-xq" = true;
+        "bluez5.hfphsp-backend" = "native";
+      };
+    };
+  };
 
   hardware = {
     opengl = {
@@ -247,7 +249,7 @@ in
   services.blueman.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput = {
+  services.libinput = {
     enable = true;
     touchpad = { disableWhileTyping = true; };
   };
@@ -289,6 +291,7 @@ in
     {
       # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       inherit (pkgs)
+        git
         gnumake
         google-chrome
         tailscale
@@ -296,8 +299,8 @@ in
         openvpn
         tpm2-abrmd
         tpm2-tools
-        git
         unzip
+        # devenv
         pulseaudioFull;
       inherit (pkgs.xfce)
         xfce4-volumed-pulse
@@ -337,7 +340,7 @@ in
   services.printing.enable = true;
   services.avahi = {
     enable = true;
-    nssmdns = true;
+    nssmdns4 = true;
     openFirewall = true;
   };
   # networking.firewall.allowedTCPPorts = [ ... ];

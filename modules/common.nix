@@ -21,8 +21,9 @@
       trusted-users = [ "root" "alain" ];
     };
     registry.nixpkgs.flake = nixpkgs;
-
     package = pkgs.nixFlakes;
-    settings.experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+    settings = {
+      experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+    };
   };
 }

@@ -5,6 +5,8 @@
     nixos-wsl.nixosModules.wsl
   ];
 
+  boot.kernelModules = [ "tun" ];
+
   services.openssh = {
     enable = true;
     settings = {
