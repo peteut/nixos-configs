@@ -88,7 +88,7 @@ in
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
-    extraUpFlags = [ "--ssh" ];
+    extraUpFlags = [ "--ssh" "--advertise-exit-node" ];
   };
 
   # Open ports in the firewall.
