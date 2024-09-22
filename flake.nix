@@ -20,7 +20,7 @@
       inputs.flake-utils.follows = "flake-utils";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.3.0";
+      url = "github:nix-community/lanzaboote/v0.4.1";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.pre-commit-hooks-nix.follows = "pre-commit-hooks";
