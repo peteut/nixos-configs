@@ -1211,6 +1211,11 @@ in
                 };
               };
             };
+            vhdl-ls = {
+              enable = true;
+              filetypes = [ "vhd" "vhdl" ];
+              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
           };
           onAttach = ''
             if client.name == "ruff_lsp" then
