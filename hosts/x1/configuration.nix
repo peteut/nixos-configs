@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lanzaboote, nixos-hardware, musnix, lib, ... }:
+{ config, pkgs, pkgsUnstable, lanzaboote, nixos-hardware, musnix, lib, ... }:
 let
   jupyterLabDefaultPort = 8888;
   tex = (pkgs.texlive.combine {
@@ -272,7 +272,6 @@ in
     extraGroups = [ "wheel" "audio" "jackaudio" "tss" "dialout" ];
     packages = (builtins.attrValues {
       inherit (pkgs)
-        joplin-desktop
         calibre
         spotify-unwrapped
         # teams
@@ -282,6 +281,7 @@ in
         pavucontrol
         qpwgraph
         ;
+      inherit (pkgsUnstable) joplin-desktop;
     }) ++ [ tex ] ++ [ pkgs.pipewire.jack ];
   };
 

@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
     gitignore = {
       url = "github:hercules-ci/gitignore.nix";
@@ -45,6 +46,7 @@
     , deploy-rs
     , flake-utils
     , nixpkgs
+    , nixpkgs-unstable
     , lanzaboote
     , gitignore
     , pre-commit-hooks
@@ -62,7 +64,9 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [{ networking.hostName = hostName; }] ++ modules;
-          specialArgs = inputs;
+          specialArgs = inputs // {
+            pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+          };
         };
 
     in
