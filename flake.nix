@@ -5,14 +5,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
-    gitignore = {
-      url = "github:hercules-ci/gitignore.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs-stable.follows = "nixpkgs";
-      inputs.gitignore.follows = "gitignore";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-wsl = {
@@ -33,11 +28,17 @@
     nixvim = {
       url = "github:nix-community/nixvim/nixos-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.flake-utils.follows = "flake-utils";
     };
     musnix = {
       url = "github:musnix/musnix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager/release-24.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    stylix = {
+      url = "github:danth/stylix/release-24.05";
     };
   };
 
@@ -47,24 +48,24 @@
     , flake-utils
     , nixpkgs
     , nixpkgs-unstable
-    , lanzaboote
-    , gitignore
     , pre-commit-hooks
-    , nixos-hardware
-    , nixos-wsl
-    , nixvim
-    , musnix
+    , home-manager
+    , ...
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
       inherit (flake-utils.lib.system) x86_64-linux aarch64-linux;
-      inherit (gitignore.lib) gitignoreSource;
+      username = "alain";
 
       mkSystem = hostName: system: modules:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [{ networking.hostName = hostName; }] ++ modules;
-          specialArgs = inputs // {
+          modules = [
+            ./modules/system/configuration.nix
+            { networking.hostName = hostName; }
+          ] ++ modules;
+          specialArgs = {
+            inherit self inputs username;
             pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
           };
         };
@@ -79,7 +80,7 @@
         checks = {
           pre-commit-check = pre-commit-hooks.lib.${system}.run
             {
-              src = gitignoreSource ./.;
+              src = ./.;
               hooks = {
                 nixpkgs-fmt.enable = true;
                 nix-linter.enable = false;
@@ -99,18 +100,18 @@
         };
       }) // {
       nixosConfigurations = {
-        rpi4 = mkSystem "rpi4" aarch64-linux [
-          ./hosts/rpi4/configuration.nix
-        ];
+        # rpi4 = mkSystem "rpi4" aarch64-linux [
+        #   ./hosts/rpi4/configuration.nix
+        # ];
         x1 = mkSystem "x1" x86_64-linux [
           ./hosts/x1/configuration.nix
         ];
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];
-        ws-10 = mkSystem "ws-10" x86_64-linux [
-          ./hosts/desktop/configuration.nix
-        ];
+        # ws-10 = mkSystem "ws-10" x86_64-linux [
+        #   ./hosts/desktop/configuration.nix
+        # ];
       };
 
       deploy.nodes =

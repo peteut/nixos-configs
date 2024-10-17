@@ -1,14 +1,15 @@
-{ lib, config, pkgs, nixvim, ... }:
+{ lib, config, pkgs, inputs, ... }:
 let
   cfg = config.modules.nvim;
   inherit (lib) mkEnableOption mkIf;
 in
 {
   imports = [
-    nixvim.nixosModules.nixvim
+    inputs.nixvim.nixosModules.nixvim
   ];
   options.modules.nvim = { enable = mkEnableOption "nvim"; };
   config = mkIf cfg.enable {
+    environment.variables = { EDITOR = "nvim"; };
     programs.nixvim = {
       enable = true;
       globals = {
@@ -101,7 +102,7 @@ in
       '';
       extraConfigLua =
         let
-          ui = builtins.readFile ./nvim/ui.lua;
+          ui = builtins.readFile ./ui.lua;
         in
         ''
           -- ui {{{
@@ -1184,10 +1185,10 @@ in
               ];
               rootDir = ''require("null-ls.utils").root_pattern(".git")'';
             };
-            jsonls = {
-              enable = true;
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
-            };
+            # jsonls = {
+            #   enable = true;
+            #   rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+            # };
             clangd = {
               enable = true;
             };
