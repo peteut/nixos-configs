@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }: {
+{ inputs, lib, pkgs, ... }: {
   boot.tmp = {
     useTmpfs = true;
   };
@@ -26,6 +26,12 @@
       experimental-features = [ "nix-command" "flakes" ];
     };
   };
+
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "google-chrome"
+      "slack"
+    ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

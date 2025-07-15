@@ -11,8 +11,11 @@ in
 
   config = mkIf cfg.enable {
     home-manager = {
+      sharedModules = [ (import ./home) ];
       useUserPackages = true;
       useGlobalPkgs = true;
+      backupFileExtension = "bak";
+      verbose = true;
       extraSpecialArgs = { inherit inputs username host; };
       users.${username} = {
         imports = [ ./home ];

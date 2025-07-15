@@ -31,7 +31,6 @@
         environment.systemPackages = [ pianoteq ];
       }
     )
-    inputs.stylix.nixosModules.stylix
   ];
 
   config = {
@@ -40,6 +39,11 @@
       musnix.enable = true;
       tailscale.enable = true;
       tex.enable = true;
+      user.enable = true;
+      pipewire = {
+        enable = true;
+        enableBT = true;
+      };
     };
 
     virtualisation = {
@@ -77,24 +81,6 @@
       #   SYMLINK+="ftdi_%n" \
       #   RUN+="/${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo -n %k >/sys%p/driver/unbind'"
     '';
-
-    stylix = {
-      enable = true;
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-      image = ./assets/nord-nixos.png;
-    };
-
-    nixpkgs.config = {
-      allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "google-chrome"
-          "spotify"
-          "zoom"
-          "teams"
-          "slack"
-          "mongodb-ce"
-        ];
-    };
 
     # Use the systemd-boot EFI boot loader.
     boot.loader.systemd-boot.enable = true;
@@ -163,77 +149,6 @@
       fwupd.enable = true;
       # Configure keymap in X11
       xserver.xkb.layout = "ch";
-
-      pulseaudio = {
-        enable = false;
-        extraConfig = ''
-          load-module module-switch-on-connect
-        '';
-        package = pkgs.pulseaudioFull.override { jackaudioSupport = true; };
-      };
-      jack = {
-        jackd.enable = false;
-        alsa.enable = false;
-      };
-      pipewire = {
-        enable = true;
-        audio.enable = true;
-        jack.enable = true;
-        pulse.enable = true;
-        alsa.enable = true;
-        extraConfig = {
-          pipewire."91-null-sinks" = {
-            "context.objects" = [
-              {
-                # A default dummy driver. This handles nodes marked with the "node.always-driver"
-                # properyty when no other driver is currently active. JACK clients need this.
-                factory = "spa-node-factory";
-                args = {
-                  "factory.name" = "support.node.driver";
-                  "node.name" = "Dummy-Driver";
-                  "priority.driver" = 8000;
-                };
-              }
-              {
-                factory = "adapter";
-                args = {
-                  "factory.name" = "support.null-audio-sink";
-                  "node.name" = "Main-Output-Proxy";
-                  "node.description" = "Main Output";
-                  "media.class" = "Audio/Sink";
-                  "audio.position" = "FL,FR";
-                };
-              }
-            ];
-          };
-          pipewire-pulse."92-low-latency" = {
-            context-objects = [
-              {
-                name = "libpipewire-module-protocol-pulse";
-                args = {
-                  pulse.min.req = "32/48000";
-                  pulse.default.req = "32/48000";
-                  pulse.max.req = "32/48000";
-                  pulse.min.quantum = "32/48000";
-                  pulse.max.quantum = "32/48000";
-                };
-              }
-            ];
-            stream.properties = {
-              node.latency = "32/48000";
-              resample.quality = 1;
-            };
-          };
-        };
-        wireplumber.extraConfig.bluetoothEnhancements = {
-          "monitor.bluez.properties" = {
-            "bluez5.roles" = [ "a2dp_sink" "a2dp_source" "bap_sink" "bap_source" "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
-            "bluez5.codecs" = [ "sbc" "sbc_xq" "aac" ];
-            "bluez5.enable-sbc-xq" = true;
-            "bluez5.hfphsp-backend" = "native";
-          };
-        };
-      };
     };
 
     hardware = {
@@ -270,40 +185,20 @@
       rtkit.enable = true;
     };
 
-    users.users.alain = {
-      isNormalUser = true;
-      password = "";
-      extraGroups = [ "wheel" "audio" "jackaudio" "tss" "dialout" ];
-      packages = (builtins.attrValues {
-        inherit (pkgs)
-          calibre
-          spotify-unwrapped
-          # teams
-          remmina
-          slack
-          element-desktop
-          pavucontrol
-          qpwgraph
-          ;
-        inherit (pkgsUnstable) joplin-desktop;
-      }) ++ [ pkgs.pipewire.jack ];
-    };
-
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     environment.systemPackages = (builtins.attrValues
       {
         # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
         inherit (pkgs)
-          git
           gnumake
-          google-chrome
+          # google-chrome
           direnv
           openvpn
           tpm2-abrmd
           tpm2-tools
           unzip
-          pulseaudioFull
+          # pulseaudioFull
           xreader;
         inherit (pkgs.xfce)
           xfce4-volumed-pulse
