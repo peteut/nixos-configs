@@ -2,28 +2,20 @@
   description = "My deploy-rs config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
-    gitignore = {
-      url = "github:hercules-ci/gitignore.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
-      inputs.gitignore.follows = "gitignore";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.1";
+      url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.pre-commit-hooks-nix.follows = "pre-commit-hooks";
     };
     deploy-rs = {
@@ -31,13 +23,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
-      url = "github:nix-community/nixvim/nixos-24.05";
+      url = "github:nix-community/nixvim/nixos-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.flake-utils.follows = "flake-utils";
     };
     musnix = {
       url = "github:musnix/musnix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    stylix = {
+      url = "github:danth/stylix/release-25.05";
     };
   };
 
@@ -47,24 +45,24 @@
     , flake-utils
     , nixpkgs
     , nixpkgs-unstable
-    , lanzaboote
-    , gitignore
     , pre-commit-hooks
-    , nixos-hardware
-    , nixos-wsl
-    , nixvim
-    , musnix
+    , home-manager
+    , ...
     }@inputs:
     let
       inherit (flake-utils.lib) eachSystem;
       inherit (flake-utils.lib.system) x86_64-linux aarch64-linux;
-      inherit (gitignore.lib) gitignoreSource;
+      username = "alain";
 
       mkSystem = hostName: system: modules:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [{ networking.hostName = hostName; }] ++ modules;
-          specialArgs = inputs // {
+          modules = [
+            ./modules/system/configuration.nix
+            { networking.hostName = hostName; }
+          ] ++ modules;
+          specialArgs = {
+            inherit self inputs username;
             pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
           };
         };
@@ -79,7 +77,7 @@
         checks = {
           pre-commit-check = pre-commit-hooks.lib.${system}.run
             {
-              src = gitignoreSource ./.;
+              src = ./.;
               hooks = {
                 nixpkgs-fmt.enable = true;
                 nix-linter.enable = false;
@@ -171,7 +169,7 @@
                 magicRollback = false;
                 autoRollback = false;
                 fastConnection = false;
-                remoteBuild = false;
+                remoteBuild = true;
               };
             };
           };

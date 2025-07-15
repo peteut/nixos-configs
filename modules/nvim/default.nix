@@ -1,14 +1,15 @@
-{ lib, config, pkgs, nixvim, ... }:
+{ lib, config, pkgs, inputs, ... }:
 let
   cfg = config.modules.nvim;
   inherit (lib) mkEnableOption mkIf;
 in
 {
   imports = [
-    nixvim.nixosModules.nixvim
+    inputs.nixvim.nixosModules.nixvim
   ];
   options.modules.nvim = { enable = mkEnableOption "nvim"; };
   config = mkIf cfg.enable {
+    environment.variables = { EDITOR = "nvim"; };
     programs.nixvim = {
       enable = true;
       globals = {
@@ -101,7 +102,7 @@ in
       '';
       extraConfigLua =
         let
-          ui = builtins.readFile ./nvim/ui.lua;
+          ui = builtins.readFile ./ui.lua;
         in
         ''
           -- ui {{{
@@ -1085,11 +1086,13 @@ in
       plugins = {
         notify = {
           enable = true;
-          timeout = 3000;
+          settings.timeout = 3000;
         };
         treesitter = {
-          enable = true;
-          indent = true;
+          settings = {
+            enable = true;
+            indent = true;
+          };
         };
         indent-blankline = {
           enable = true;
@@ -1104,35 +1107,34 @@ in
         };
         noice = {
           enable = true;
-          lsp = {
-            override = {
-              "vim.lsp.util.convert_input_to_markdown_lines" = true;
-              "vim.lsp.util.stylize_markdown" = true;
-              "cmp.entry.get_documentation" = true;
+          settings = {
+            lsp = {
+              override = {
+                "vim.lsp.util.convert_input_to_markdown_lines" = true;
+                "vim.lsp.util.stylize_markdown" = true;
+                "cmp.entry.get_documentation" = true;
+              };
             };
-          };
-          presets = {
-            bottom_search = true;
-            command_palette = true;
-            long_message_to_split = true;
-            inc_rename = true;
-          };
-          routes = [{
-            filter = {
-              event = "msg_show";
-              find = "%d+L, %d+B";
+            presets = {
+              bottom_search = true;
+              command_palette = true;
+              long_message_to_split = true;
+              inc_rename = true;
             };
-            view = "mini";
-          }];
+            routes = [{
+              filter = {
+                event = "msg_show";
+                find = "%d+L, %d+B";
+              };
+              view = "mini";
+            }];
+          };
         };
         telescope = {
           enable = true;
         };
         trouble = {
           enable = true;
-          settings = {
-            use_diagnostic_signs = true;
-          };
         };
         which-key = {
           enable = true;
@@ -1166,34 +1168,35 @@ in
                 '';
                 override = true;
               };
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
             };
-            ruff-lsp = {
+            ruff = {
               enable = true;
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
             };
             gopls = {
               enable = true;
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
             };
             hls = {
               enable = true;
+              installGhc = false;
               cmd = [
                 "haskell-language-server-wrapper"
                 "--lsp"
               ];
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
             };
             jsonls = {
               enable = true;
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
             };
             clangd = {
               enable = true;
             };
-            nil-ls = {
+            nil_ls = {
               enable = true;
-              rootDir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern("flake.nix", ".git")'';
               extraOptions = {
                 settings = {
                   nil = {
@@ -1211,18 +1214,23 @@ in
                 };
               };
             };
-            vhdl-ls = {
+            vhdl_ls = {
               enable = true;
               filetypes = [ "vhd" "vhdl" ];
-              rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+              settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
+            };
+            rust_analyzer = {
+              enable = true;
+              installCargo = false;
+              installRustc = false;
             };
           };
           onAttach = ''
-            if client.name == "ruff_lsp" then
+            if client.name == "ruff" then
               -- disable hover in favor of Pyright
               client.server_capabilities.hoverProvider = false
             end
-            vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.utils").format, { buffer = bufnr; desc = "Format" })
+            vim.keymap.set({ "n", "v" }, "<leader>cf", require("lazyvim.util").format, { buffer = bufnr; desc = "Format" })
           '';
           keymaps = {
             lspBuf = {
@@ -1260,7 +1268,7 @@ in
               enable = true;
             };
           };
-          rootDir = ''require("null-ls.utils").root_pattern(".git")'';
+          settings.root_dir = ''require("null-ls.utils").root_pattern(".git")'';
         };
         cmp-nvim-lsp.enable = true;
         cmp-path.enable = true;
@@ -1305,6 +1313,7 @@ in
         };
         mini = {
           enable = true;
+          mockDevIcons = true;
           modules = {
             pairs = { };
             comment = { };
@@ -1314,51 +1323,65 @@ in
               options = { try_as_boarder = true; };
             };
             trailspace = { };
+            surround = {
+              mappings = {
+                add = "gsa";
+                delete = "gsd";
+                find = "gsf";
+                find_left = "gsF";
+                highlight = "gsh";
+                replace = "gsr";
+                update_n_lines = "gsn";
+              };
+            };
+            icons = { };
           };
         };
         lualine = {
           # WIP, migrate from ui.lua
           enable = false;
-          extensions = [ "neo-tree" ];
-          globalstatus = true;
-          iconsEnabled = true;
-          disabledFiletypes.statusline = [ "dashboard" "alpha" ];
-          sections = {
-            lualine_a = [ "mode" ];
-            lualine_b = [ "branch" ];
-            lualine_c = [
-              "diagnostics"
-              {
-                name = "filetype";
-                padding = {
-                  left = 1;
-                  right = 0;
-                };
-                separator = {
-                  left = "";
-                  right = "";
-                };
-                extraConfig = {
-                  icon_only = true;
-                };
-              }
-              {
-                name = "filename";
-                extraConfig = {
-                  path = 1;
-                };
-              }
-              {
-                name = ''
-                  function() return require("nvim-navic").get_location() end
-                '';
-                extraConfig = {
-                  cond = ''
-                    function() return package.loaded["nvim-navic"] and require("nvim-navic").is_available() end
+          settings = {
+            extensions = [ "neo-tree" ];
+            sections = {
+              lualine_a = [ "mode" ];
+              lualine_b = [ "branch" ];
+              lualine_c = [
+                "diagnostics"
+                {
+                  name = "filetype";
+                  padding = {
+                    left = 1;
+                    right = 0;
+                  };
+                  separator = {
+                    left = "";
+                    right = "";
+                  };
+                  extraConfig = {
+                    icon_only = true;
+                  };
+                }
+                {
+                  name = "filename";
+                  extraConfig = {
+                    path = 1;
+                  };
+                }
+                {
+                  name = ''
+                    function() return require("nvim-navic").get_location() end
                   '';
-                };
-              }
-            ];
+                  extraConfig = {
+                    cond = ''
+                      function() return package.loaded["nvim-navic"] and require("nvim-navic").is_available() end
+                    '';
+                  };
+                }
+              ];
+            };
+            globalstatus = true;
+            icons_enabled = true;
+            disabled_filetypes.statusline = [ "dashboard" "alpha" ];
           };
         };
         neo-tree = {
@@ -1399,7 +1422,6 @@ in
           LazyVim
           bufferline-nvim
           lualine-nvim
-          nvim-web-devicons
           nui-nvim
           ;
       };

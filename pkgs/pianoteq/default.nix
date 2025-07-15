@@ -1,5 +1,5 @@
 { pkgs, stdenv, fetchurl, requireFile, makeDesktopItem }:
-# derived from https://github.com/qhga/nix-pianoteq7, 
+# derived from https://github.com/qhga/nix-pianoteq7,
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/audio/pianoteq/default.nix
 let
   name = "stage-8";
