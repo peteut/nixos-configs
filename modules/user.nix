@@ -2,10 +2,14 @@
 let
   cfg = config.modules.user;
   inherit (lib) mkEnableOption mkIf;
+  inherit (lib.options) mkPackageOption;
 in
 {
   options.modules.user = {
     enable = mkEnableOption "user";
+    shell = mkPackageOption pkgs "shell" {
+      default = "nushell";
+    };
   };
   imports = [ inputs.home-manager.nixosModules.home-manager ];
 
@@ -32,7 +36,7 @@ in
       isNormalUser = true;
       description = "${username}";
       extraGroups = [ "networkmanager" "wheel" "audio" "dialout" ];
-      shell = pkgs.zsh;
+      shell = cfg.shell;
     };
   };
 }
