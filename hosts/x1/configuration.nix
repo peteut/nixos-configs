@@ -192,13 +192,10 @@
         # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
         inherit (pkgs)
           gnumake
-          # google-chrome
-          direnv
           openvpn
           tpm2-abrmd
           tpm2-tools
           unzip
-          # pulseaudioFull
           xreader;
         inherit (pkgs.xfce)
           xfce4-volumed-pulse

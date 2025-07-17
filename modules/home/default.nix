@@ -7,5 +7,6 @@
     ./git.nix
     ./lazygit.nix
     ./packages
+    ./nushell.nix
   ];
 }

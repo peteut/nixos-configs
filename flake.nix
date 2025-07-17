@@ -73,6 +73,7 @@
       (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        inherit (builtins) mapAttrs;
       in
       {
         checks = {
@@ -84,14 +85,14 @@
                 nix-linter.enable = false;
                 stylua.enable = true;
               };
-            } // (builtins.mapAttrs
+            } // (mapAttrs
             (_: deployLib: deployLib.deployChecks self.deploy)
             deploy-rs.lib.${system});
         };
 
         devShells.default = pkgs.mkShell {
           buildInputs = [
-            deploy-rs.defaultPackage.${system}
+            deploy-rs.packages.${system}.deploy-rs
             pkgs.nixpkgs-fmt
           ];
           inherit (self.checks.${system}.pre-commit-check) shellHook;
