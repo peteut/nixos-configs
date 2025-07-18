@@ -44,6 +44,7 @@
         enable = true;
         enableBT = true;
       };
+      hyprland.enable = true;
     };
 
     virtualisation = {
@@ -111,14 +112,13 @@
       defaultSession = "xfce";
     };
     services.picom = {
-      enable = true;
+      enable = false;
       fade = true;
       inactiveOpacity = 0.9;
       shadow = false;
       fadeDelta = 4;
       vSync = true;
     };
-    programs.hyprland.enable = true;
     programs.thunar = {
       enable = true;
       plugins = builtins.attrValues {
@@ -232,13 +232,6 @@
       enable = true;
       nssmdns4 = true;
       openFirewall = true;
-    };
-
-    # services.flatpak.enable = true;
-
-    fonts = {
-      enableDefaultPackages = true;
-      packages = (builtins.attrValues { inherit (pkgs.nerd-fonts) jetbrains-mono; });
     };
   };
 }

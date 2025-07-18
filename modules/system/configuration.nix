@@ -1,4 +1,8 @@
-{ inputs, lib, pkgs, ... }: {
+{ inputs, lib, pkgs, ... }:
+let
+  inherit (builtins) readFile elem;
+in
+{
   boot.tmp = {
     useTmpfs = true;
   };
@@ -17,7 +21,7 @@
       options = "--delete-older-than 7d";
     };
     settings = {
-      trusted-public-keys = [ (builtins.readFile ./../../nix-pub.pem) ];
+      trusted-public-keys = [ (readFile ./../../nix-pub.pem) ];
       trusted-users = [ "root" "alain" ];
     };
     registry.nixpkgs.flake = inputs.nixpkgs;
@@ -28,7 +32,7 @@
   };
 
   nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
+    elem (lib.getName pkg) [
       "google-chrome"
       "slack"
     ];

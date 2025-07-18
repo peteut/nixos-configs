@@ -1,0 +1,113 @@
+{ ... }:
+{
+  programs.waybar.settings.mainBar = {
+    position = "bottom";
+    layer = "top";
+    height = 28;
+    margin-top = 0;
+    margin-bottom = 0;
+    margin-left = 0;
+    margin-right = 0;
+    modules-left = [
+      "hyprland/workspaces"
+      "tray"
+    ];
+    modules-center = [ "clock" ];
+    modules-right = [
+      "cpu"
+      "memory"
+      "disk"
+      "pulseaudio"
+      "network"
+      "battery"
+      "custom/notification"
+    ];
+    clock = {
+      format = "  {:%H:%M}";
+      tooltip = "true";
+      tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+      format-alt = "  {:%d/%m}";
+    };
+    "hyprland/workspaces" = {
+      active-only = false;
+      disable-scroll = true;
+      format = "{icon}";
+      on-click = "activate";
+      format-icons = {
+        "1" = "I";
+        "2" = "II";
+        "3" = "III";
+        "4" = "IV";
+        "5" = "V";
+        "6" = "VI";
+        "7" = "VII";
+        "8" = "VIII";
+        "9" = "IX";
+        "10" = "X";
+        sort-by-number = true;
+      };
+      persistent-workspaces = {
+        "1" = [ ];
+        "2" = [ ];
+        "3" = [ ];
+        "4" = [ ];
+        "5" = [ ];
+      };
+    };
+    cpu = {
+      format = " {usage}%";
+      format-alt = " {avg_frequency} GHz";
+      interval = 2;
+    };
+    memory = {
+      format = "󰟜 {}%";
+      format-alt = "󰟜 {used} GiB"; # 
+      interval = 2;
+    };
+    disk = {
+      format = "󰋊 {percentage_used}%";
+      interval = 60;
+    };
+    network = {
+      format-wifi = "  {signalStrength}%";
+      format-ethernet = "󰀂";
+      tooltip-format = "Connected to {essid} {ifname} via {gwaddr}";
+      format-linked = "{ifname} (No IP)";
+      format-disconnected = "󰖪";
+    };
+    tray = {
+      icon-size = 20;
+      spacing = 8;
+    };
+    pulseaudio = {
+      format = "{icon} {volume}%";
+      format-muted = "  {volume}%";
+      format-icons = {
+        default = [ " " ];
+      };
+      scroll-step = 2;
+      on-click = "pamixer -t";
+      on-click-right = "pavucontrol";
+    };
+    battery = {
+      format = "{icon} {capacity}%";
+      format-icons = [
+        " "
+        " "
+        " "
+        " "
+        " "
+      ];
+      format-charging = " {capacity}%";
+      format-full = " {capacity}%";
+      format-warning = "{capacity}%";
+      interval = 5;
+      states = {
+        warning = 20;
+      };
+      format-time = "{H}h{M}m";
+      tooltip = true;
+      tooltip-format = "{time}";
+    };
+  };
+}

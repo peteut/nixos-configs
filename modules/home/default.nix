@@ -8,5 +8,11 @@
     ./lazygit.nix
     ./packages
     ./nushell.nix
+    ./wezterm.nix
+    ./hyprland
+    ./waybar
+    ./dunst.nix
+    ./wofi.nix
+    ./wlogout.nix
   ];
 }

@@ -1,5 +1,6 @@
 { inputs, pkgs, ... }:
-let fontSize = 8;
+let
+  fontSize = 7;
 in
 {
   imports = [ inputs.stylix.nixosModules.stylix ];
@@ -17,11 +18,25 @@ in
         size = 24;
       };
 
-      fonts.sizes = {
-        applications = fontSize;
-        desktop = fontSize;
-        popups = fontSize;
-        terminal = fontSize;
+      fonts = {
+        sansSerif = {
+          package = pkgs.noto-fonts;
+          name = "Noto Sans";
+        };
+        serif = {
+          package = pkgs.noto-fonts;
+          name = "Noto Serif";
+        };
+        monospace = {
+          package = pkgs.nerd-fonts.jetbrains-mono;
+          name = "JetBrainsMono Nerd Font";
+        };
+        sizes = {
+          applications = fontSize;
+          desktop = fontSize;
+          popups = fontSize;
+          terminal = fontSize;
+        };
       };
     };
   };

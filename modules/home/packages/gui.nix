@@ -14,8 +14,9 @@ in
       remmina
       slack
       # teams
-      joplin-desktop;
-    # }}}
+      joplin-desktop
+      # }}}
+      ;
   };
 }
 

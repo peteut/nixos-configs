@@ -20,7 +20,7 @@ in
       useGlobalPkgs = true;
       backupFileExtension = "bak";
       verbose = true;
-      extraSpecialArgs = { inherit inputs username host; };
+      extraSpecialArgs = { inherit inputs username host; modules-config = config.modules; };
       users.${username} = {
         imports = [ ./home ];
         home = {
