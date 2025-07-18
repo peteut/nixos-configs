@@ -22,7 +22,10 @@ in
       verbose = true;
       extraSpecialArgs = { inherit inputs username host; };
       users.${username} = {
-        imports = [ ./home ];
+        imports = [
+          inputs.stylix.homeModules.stylix
+          ./home
+        ];
         home = {
           username = "${username}";
           stateVersion = "24.05";

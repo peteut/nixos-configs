@@ -81,10 +81,6 @@ in
         wireplumber.extraConfig = optionalAttrs cfg.enableBT wireplumberExtraConfigBT;
       };
     };
-    hardware.alsa.enablePersistence = true;
-    environment.systemPackages = builtins.attrValues {
-      inherit (pkgs) pulseaudioFull;
-    };
   };
 }
 

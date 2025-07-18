@@ -44,15 +44,7 @@
         enable = true;
         enableBT = true;
       };
-    };
-
-    virtualisation = {
-      podman = {
-        enable = true;
-        dockerCompat = true;
-        autoPrune.enable = true;
-        defaultNetwork.settings.dns_enabled = true;
-      };
+      hyprland.enable = true;
     };
 
     services.udev.extraRules = ''
@@ -96,29 +88,6 @@
     networking.networkmanager.enable =
       true; # Easiest to use and most distros use this by default.
     systemd.services.NetworkManager-wait-online.enable = false;
-
-    # Enable the X11 windowing system.
-    services.xserver = {
-      enable = true;
-      videoDrivers = [ "modesetting" ];
-      desktopManager = {
-        xfce.enable = true;
-        xterm.enable = false;
-      };
-    };
-    services.displayManager = {
-      enable = true;
-      defaultSession = "xfce";
-    };
-    services.picom = {
-      enable = true;
-      fade = true;
-      inactiveOpacity = 0.9;
-      shadow = false;
-      fadeDelta = 4;
-      vSync = true;
-    };
-    programs.hyprland.enable = true;
     programs.thunar = {
       enable = true;
       plugins = builtins.attrValues {
@@ -226,19 +195,11 @@
     };
 
     services.fprintd.enable = true;
-    services.onedrive.enable = true;
     services.printing.enable = true;
     services.avahi = {
       enable = true;
       nssmdns4 = true;
       openFirewall = true;
-    };
-
-    # services.flatpak.enable = true;
-
-    fonts = {
-      enableDefaultPackages = true;
-      packages = (builtins.attrValues { inherit (pkgs.nerd-fonts) jetbrains-mono; });
     };
   };
 }

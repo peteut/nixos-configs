@@ -1,5 +1,6 @@
 { pkgs, ... }:
-let inherit (builtins) attrValues;
+let
+  inherit (builtins) attrValues;
 in
 {
   home.packages = attrValues {

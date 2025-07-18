@@ -1,7 +1,6 @@
 { ... }:
 {
   imports = [
-    ./gui.nix
-    ./tui.nix
+    ./config.nix
   ];
 }
