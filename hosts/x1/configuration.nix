@@ -44,6 +44,7 @@
         enable = true;
         enableBT = true;
       };
+      hyprland.enable = true;
     };
 
     virtualisation = {
@@ -118,7 +119,6 @@
       fadeDelta = 4;
       vSync = true;
     };
-    programs.hyprland.enable = true;
     programs.thunar = {
       enable = true;
       plugins = builtins.attrValues {

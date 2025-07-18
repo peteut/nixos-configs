@@ -8,5 +8,8 @@
     ./lazygit.nix
     ./packages
     ./nushell.nix
+    ./wezterm.nix
+    ./hyprland
+    ./waybar
   ];
 }

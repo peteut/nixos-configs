@@ -8,5 +8,6 @@
     ./tex.nix
     ./user.nix
     ./stylix
+    ./hyprland.nix
   ];
 }
