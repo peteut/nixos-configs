@@ -88,8 +88,8 @@ in
     };
     extraConfig = ''
       monitor = , preferred, auto, 1.0
-      monitor = DP-6, 1920x1080, 0x120, 1.0
-      monitor = DP-5, 1920x1080, 1920x120, 1.0
+      monitor = desc:Dell Inc. DELL U2414H X4J7181T1P4L, 1920x1080, 0x120, 1.0
+      monitor = desc:Dell Inc. DELL U2414H X4J7181T1P6L, 1920x1080, 1920x120, 1.0
       monitor = eDP-1, 1920x1200, 3840x0, 1.2
 
       xwayland {
