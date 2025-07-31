@@ -8,7 +8,7 @@ in
     icons = {
       enable = true;
       package = pkgs.papirus-icon-theme;
-      dark = "Papirus";
+      dark = "Papirus-Dark";
     };
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
