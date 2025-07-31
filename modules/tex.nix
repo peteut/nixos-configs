@@ -1,10 +1,7 @@
-{ lib, config, pkgs, username, ... }:
+{ lib, config, ... }:
 let
   cfg = config.modules.tex;
   inherit (lib) mkEnableOption mkIf;
-  tex = (pkgs.texlive.combine {
-    inherit (pkgs.texlive) scheme-tetex koma-script amsmath latexmk moderncv;
-  });
 in
 {
   options.modules.tex = {
@@ -12,8 +9,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    users.users.${username} = {
-      packages = [ tex ];
-    };
+    # moved to HM
   };
 }

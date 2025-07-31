@@ -16,5 +16,6 @@
     ./rofi.nix
     ./wlsunset.nix
     ./stylix
+    ./tex.nix
   ];
 }
