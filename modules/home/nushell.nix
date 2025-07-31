@@ -20,9 +20,15 @@ in
           ;
       };
     };
-    programs.direnv = {
-      enable = true;
-      enableNushellIntegration = true;
+    programs = {
+      direnv = {
+        enable = true;
+        enableNushellIntegration = true;
+      };
+      carapace = {
+        enable = true;
+        enableNushellIntegration = true;
+      };
     };
     services.ssh-agent = {
       enable = true;
