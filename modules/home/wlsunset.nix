@@ -4,11 +4,9 @@ let
   inherit (lib) mkIf;
 in
 {
-  config = mkIf cfg.enable {
-    services.wlsunset = {
-      enable = true;
-      latitude = 47;
-      longitude = 7;
-    };
+  services.wlsunset = mkIf cfg.enable {
+    enable = true;
+    latitude = 47;
+    longitude = 7;
   };
 }

@@ -1,11 +1,10 @@
-{ lib, pkgs, ... }:
+{ ... }:
 let
   font = "JetBrainsMono Nerd Font";
 in
 {
   programs.wezterm = {
     enable = true;
-    package = pkgs.wezterm;
     extraConfig = ''
       local wezterm = require 'wezterm'
       local config = wezterm.config_builder()

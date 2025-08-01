@@ -4,10 +4,8 @@ let
   inherit (lib) mkIf;
 in
 {
-  config = mkIf cfg.enable {
-    programs.waybar = {
-      enable = true;
-      systemd.enable = true;
-    };
+  programs.waybar = mkIf cfg.enable {
+    enable = true;
+    systemd.enable = true;
   };
 }
