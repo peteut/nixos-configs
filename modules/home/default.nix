@@ -16,5 +16,6 @@
     ./wlsunset.nix
     ./stylix
     ./tex.nix
+    ./zellij.nix
   ];
 }
