@@ -13,9 +13,9 @@
     ./waybar
     ./dunst.nix
     ./wofi.nix
-    ./rofi.nix
     ./wlsunset.nix
     ./stylix
     ./tex.nix
+    ./helix.nix
   ];
 }

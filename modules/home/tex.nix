@@ -12,10 +12,8 @@ let
   };
 in
 {
-  config = mkIf cfg.enable {
-    programs.texlive = {
-      enable = true;
-      inherit extraPackages;
-    };
+  programs.texlive = mkIf cfg.enable {
+    enable = true;
+    inherit extraPackages;
   };
 }

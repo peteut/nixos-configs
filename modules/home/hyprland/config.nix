@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 let
   terminal = "wezterm";
   splitToLines = s: lib.splitString "\n" s;
