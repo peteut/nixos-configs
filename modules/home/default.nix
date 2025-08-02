@@ -16,6 +16,6 @@
     ./wlsunset.nix
     ./stylix
     ./tex.nix
-    ./helix.nix
+    ./helix
   ];
 }
