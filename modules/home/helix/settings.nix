@@ -27,5 +27,24 @@
         end = "no_op";
       };
     };
+    editor = {
+      statusline = {
+        left = [ "mode" "spinner" "version-control" ];
+        center = [ "file-name" "file-modification-indicator" ];
+      };
+      lsp = {
+        display-inlay-hints = true;
+      };
+      indent-guides = {
+        render = true;
+        character = "▏";
+        skip-levels = 1;
+      };
+      end-of-line-diagnostics = "hint";
+      inline-diagnostics = {
+        cursor-line = "hint";
+        other-lines = "hint";
+      };
+    };
   };
 }
