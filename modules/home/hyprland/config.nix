@@ -7,6 +7,7 @@ let
 in
 {
   gtk.enable = true;
+  qt.enable = true;
   wayland.windowManager.hyprland = {
     settings = {
       exec-once = splitToLines ''
