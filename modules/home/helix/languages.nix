@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 let
   inherit (builtins) attrValues readFile;
-  inherit (lib) getExe getExe';
   vsgFmtWrapperPath = "helix/scripts/vsg_wrapper.nu";
   vsgFmtWrapper = readFile ./vsg_wrapper.nu;
 in
@@ -13,15 +12,6 @@ in
   programs.helix = {
     extraPackages = attrValues {
       inherit (pkgs)
-        nixd
-        nil
-        marksman
-        gopls
-        go# for gofmt
-        golangci-lint-langserver
-        ruff
-        pyright
-        vhdl-ls
         nushell
         ;
     };
@@ -31,18 +21,18 @@ in
         {
           name = "nix";
           auto-format = true;
-          formatter.command = getExe pkgs.nixpkgs-fmt;
+          formatter.command = "nixpkgs-fmt";
         }
         {
           name = "go";
-          formatter.command = getExe' pkgs.go "gofmt";
+          formatter.command = "gofmt";
         }
         {
           name = "python";
           auto-format = true;
           language-servers = [ "pyright" "ruff" ];
           formatter = {
-            command = getExe pkgs.black;
+            command = "black";
             args = [ "-" "--quiet" ];
           };
         }

@@ -7,7 +7,7 @@ def main [] {
     if $env.VSG_CONFIG? != null and ($env.VSG_CONFIG | path exists) {
       $cmd ++= ["-c" $"($env.VSG_CONFIG | path expand)"]
     }
-  $cmd = ["--fix" $tmpFile]
+  $cmd ++= ["--fix" $tmpFile]
   run-external ...$cmd | ignore
   open --raw $tmpFile | print
   rm $tmpFile
