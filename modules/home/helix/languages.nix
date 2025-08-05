@@ -1,24 +1,9 @@
 { config, lib, pkgs, ... }:
 let
-  inherit (builtins) attrValues;
+  inherit (builtins) attrValues readFile;
   inherit (lib) getExe getExe';
   vsgFmtWrapperPath = "helix/scripts/vsg_wrapper.nu";
-  vsgFmtWrapper = ''
-    #!/usr/bin/env -S nu --stdin
-
-    def main [] {
-      let tmpFile = (mktemp -t --suffix .vhd)
-      $in | save -f $tmpFile
-      mut cmd = ["vsg" "-of" "syntastic"]
-      if $env.VSG_CONFIG? != null and ($env.VSG_CONFIG | path exists) {
-        $cmd = $cmd | append ["-c" $"($env.VSG_CONFIG | path expand)"]
-      }
-      $cmd = $cmd | append ["--fix" $tmpFile]
-      run-external ...$cmd | ignore
-      open --raw $tmpFile | print
-      rm $tmpFile
-    }
-  '';
+  vsgFmtWrapper = readFile ./vsg_wrapper.nu;
 in
 {
   xdg.configFile.${vsgFmtWrapperPath} = {
@@ -29,6 +14,7 @@ in
     extraPackages = attrValues {
       inherit (pkgs)
         nixd
+        nil
         marksman
         gopls
         go# for gofmt
@@ -43,11 +29,17 @@ in
     languages = {
       language = [
         {
+          name = "nix";
+          auto-format = true;
+          formatter.command = getExe pkgs.nixpkgs-fmt;
+        }
+        {
           name = "go";
           formatter.command = getExe' pkgs.go "gofmt";
         }
         {
           name = "python";
+          auto-format = true;
           language-servers = [ "pyright" "ruff" ];
           formatter = {
             command = getExe pkgs.black;
