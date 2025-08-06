@@ -5,7 +5,6 @@ in
 {
   programs.nushell = {
     enable = true;
-    package = pkgsUnstable.nushell;
     settings = {
       show_banner = false;
     };
@@ -28,6 +27,7 @@ in
     };
     carapace = {
       enable = true;
+      package = pkgsUnstable.carapace;
       enableNushellIntegration = true;
     };
   };
