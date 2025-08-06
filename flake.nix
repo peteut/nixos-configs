@@ -73,7 +73,7 @@
       (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        inherit (builtins) mapAttrs;
+        inherit (builtins) attrValues mapAttrs;
       in
       {
         checks = {
@@ -90,13 +90,18 @@
             deploy-rs.lib.${system});
         };
 
-        devShells.default = pkgs.mkShell {
-          buildInputs = [
-            deploy-rs.packages.${system}.deploy-rs
-            pkgs.nixpkgs-fmt
-          ];
-          inherit (self.checks.${system}.pre-commit-check) shellHook;
-        };
+        devShells.default = pkgs.mkShell
+          {
+            buildInputs = attrValues {
+              inherit (deploy-rs.packages.${system}) deploy-rs;
+              inherit (pkgs)
+                nixpkgs-fmt
+                nil
+                nixd
+                ;
+            };
+            inherit (self.checks.${ system}.pre-commit-check) shellHook;
+          };
       }) // {
       nixosConfigurations = {
         rpi4 = mkSystem "rpi4" aarch64-linux [

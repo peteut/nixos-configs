@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, lib, username, host, ... }:
+{ inputs, config, pkgs, pkgsUnstable, lib, username, host, ... }:
 let
   cfg = config.modules.user;
   inherit (lib) mkEnableOption mkIf;
@@ -20,7 +20,7 @@ in
       useGlobalPkgs = true;
       backupFileExtension = "bak";
       verbose = true;
-      extraSpecialArgs = { inherit inputs username host; };
+      extraSpecialArgs = { inherit inputs username host pkgsUnstable; };
       users.${username} = {
         imports = [
           inputs.stylix.homeModules.stylix

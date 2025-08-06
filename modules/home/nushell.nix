@@ -1,10 +1,11 @@
-{ osConfig, lib, ... }:
+{ osConfig, lib, pkgsUnstable, ... }:
 let
   inherit (lib) mkIf hasAttrByPath;
 in
 {
   programs.nushell = {
     enable = true;
+    package = pkgsUnstable.nushell;
     settings = {
       show_banner = false;
     };
