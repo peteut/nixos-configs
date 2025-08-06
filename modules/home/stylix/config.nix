@@ -5,6 +5,7 @@ in
 {
   stylix = {
     enable = true;
+    targets."helix".enable = false;
     icons = {
       enable = true;
       package = pkgs.papirus-icon-theme;
