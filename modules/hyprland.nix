@@ -1,7 +1,10 @@
-{ lib, config, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.modules.hyprland;
   inherit (lib) mkIf mkEnableOption;
+  sddm-astronaut = pkgs.sddm-astronaut.override {
+    embeddedTheme = "astronaut";
+  };
 in
 {
   options.modules.hyprland = {
@@ -13,9 +16,12 @@ in
       withUWSM = true;
     };
     services.displayManager.sddm = {
+      package = pkgs.kdePackages.sddm;
+      extraPackages = [ sddm-astronaut ];
+      theme = "sddm-astronaut-theme";
       enable = true;
       wayland.enable = true;
     };
+    environment.systemPackages = [ sddm-astronaut ];
   };
 }
-
