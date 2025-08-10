@@ -4,6 +4,7 @@ let
   splitToLines = s: lib.splitString "\n" s;
   browser = "google-chrome-stable";
   uwsmPrefix = "uwsm app --";
+  wofiLauncher = ''$(wofi --show drun --define=drun-print_desktop_file=true | sed -E "s/(\.desktop) /\1:/")'';
 in
 {
   gtk.enable = true;
@@ -34,7 +35,7 @@ in
         "SUPER SHIFT, F, fullscreen, 1"
         "SUPER, Space, exec, ${uwsmPrefix} togglefloating"
         "ALT, Escape, exec, ${uwsmPrefix} loginctl lock-session"
-        "SUPER, R, exec, ${uwsmPrefix} wofi --show run --prompt=Run --term=${terminal}"
+        "SUPER, R, exec, ${uwsmPrefix} ${wofiLauncher}"
 
         # switch focus
         "SUPER, h, movefocus, l"
