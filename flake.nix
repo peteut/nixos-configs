@@ -46,7 +46,6 @@
     , nixpkgs
     , nixpkgs-unstable
     , pre-commit-hooks
-    , home-manager
     , ...
     }@inputs:
     let

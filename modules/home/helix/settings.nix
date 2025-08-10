@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.helix.settings = {
-    theme = "nord";
+    theme = "nord-night";
     keys = {
       normal = {
         up = "no_op";
@@ -29,6 +29,10 @@
       };
     };
     editor = {
+      trim-trailing-whitespace = true;
+      cursor-shape = {
+        insert = "bar";
+      };
       statusline = {
         left = [ "mode" "spinner" "version-control" ];
         center = [ "file-name" "file-modification-indicator" ];
