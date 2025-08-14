@@ -10,6 +10,9 @@ in
     shell = mkPackageOption pkgs "shell" {
       default = "nushell";
     };
+    editor = mkPackageOption pkgsUnstable "editor" {
+      default = "helix";
+    };
   };
   imports = [ inputs.home-manager.nixosModules.home-manager ];
 
