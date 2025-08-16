@@ -1,7 +1,7 @@
 { ... }:
 {
   programs.helix.settings = {
-    theme = "nord-night";
+    theme = "nord";
     keys = {
       normal = {
         up = "no_op";
