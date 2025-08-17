@@ -55,8 +55,23 @@
       username = "alain";
 
       mkSystem = hostName: system: modules:
+        let
+          inherit (builtins) elem;
+          inherit (nixpkgs.lib) getName;
+          pkgs = import nixpkgs {
+            inherit system;
+            config = {
+              allowUnfreePredicate = pkg:
+                elem (getName pkg) [
+                  "google-chrome"
+                  "slack"
+                  "pianoteq-stage"
+                ];
+            };
+          };
+        in
         nixpkgs.lib.nixosSystem {
-          inherit system;
+          inherit system pkgs;
           modules = [
             ./modules/system/configuration.nix
             { networking.hostName = hostName; }

@@ -1,6 +1,6 @@
-{ inputs, lib, pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
-  inherit (builtins) readFile elem;
+  inherit (builtins) readFile;
 in
 {
   boot.tmp = {
@@ -30,12 +30,6 @@ in
       experimental-features = [ "nix-command" "flakes" ];
     };
   };
-
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    elem (lib.getName pkg) [
-      "google-chrome"
-      "slack"
-    ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
