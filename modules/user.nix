@@ -1,7 +1,9 @@
 { inputs, config, pkgs, pkgsUnstable, lib, username, host, ... }:
 let
   cfg = config.modules.user;
-  inherit (lib) mkEnableOption mkIf;
+  inherit (builtins) listToAttrs;
+  inherit (lib) mkEnableOption mkIf mkOption types getName;
+  inherit (lib.attrsets) nameValuePair;
   inherit (lib.options) mkPackageOption;
 in
 {
@@ -12,6 +14,20 @@ in
     };
     editor = mkPackageOption pkgsUnstable "editor" {
       default = "helix";
+    };
+    programs = mkOption {
+      type = types.listOf types.package;
+      default = [ ];
+      description = ''
+        Programs configured by home-manager.
+      '';
+    };
+    packages = mkOption {
+      type = types.listOf types.package;
+      default = [ ];
+      description = ''
+        User packages.
+      '';
     };
   };
   imports = [ inputs.home-manager.nixosModules.home-manager ];
@@ -33,8 +49,14 @@ in
           username = "${username}";
           stateVersion = "24.05";
           homeDirectory = "/home/${username}";
+          packages = cfg.packages;
         };
-        programs.home-manager.enable = true;
+        programs = (listToAttrs
+          (map
+            (p: nameValuePair (getName p) { enable = true; })
+            cfg.programs)) // {
+          home-manager.enable = true;
+        };
       };
     };
 
