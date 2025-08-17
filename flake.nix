@@ -22,10 +22,6 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixvim = {
-      url = "github:nix-community/nixvim/nixos-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     musnix = {
       url = "github:musnix/musnix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -117,6 +113,8 @@
                 nixpkgs-fmt
                 nil
                 nixd
+                dotenvx
+                sops
                 ;
             };
             inherit (self.checks.${ system}.pre-commit-check) shellHook;

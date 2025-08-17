@@ -6,7 +6,6 @@
 
   config = {
     modules = {
-      nvim.enable = true;
       wsl.enable = true;
     };
 

@@ -31,7 +31,6 @@ in
 
   config = {
     modules = {
-      nvim.enable = false;
       musnix.enable = true;
       tailscale.enable = true;
       tex.enable = true;
