@@ -3,6 +3,9 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { pkgs, inputs, ... }:
+let
+  inherit (builtins) attrValues;
+in
 {
   imports = [
     ../../modules
@@ -14,7 +17,7 @@
     inputs.lanzaboote.nixosModules.lanzaboote
     ({ pkgs, lib, ... }: {
       # boot.bootspec.enable = true;
-      environment.systemPackages = builtins.attrValues {
+      environment.systemPackages = attrValues {
         inherit (pkgs) sbctl;
       };
       # Lanzaboote currently replaces the sytemd-boot module.
@@ -24,22 +27,20 @@
         pkiBundle = "/etc/secureboot";
       };
     })
-    ({ pkgs, ... }:
-      let pianoteq = pkgs.callPackage ../../pkgs/pianoteq/default.nix { };
-      in
-      {
-        environment.systemPackages = [ pianoteq ];
-      }
-    )
   ];
 
   config = {
     modules = {
-      nvim.enable = true;
+      nvim.enable = false;
       musnix.enable = true;
       tailscale.enable = true;
       tex.enable = true;
-      user.enable = true;
+      user = {
+        enable = true;
+        packages = attrValues {
+          inherit (pkgs.pianoteq) stage_8;
+        };
+      };
       pipewire = {
         enable = true;
         enableBT = true;
@@ -123,7 +124,7 @@
     hardware = {
       graphics = {
         enable = true;
-        extraPackages = builtins.attrValues {
+        extraPackages = attrValues {
           inherit (pkgs) intel-media-driver;
         };
       };
@@ -156,7 +157,7 @@
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
-    environment.systemPackages = (builtins.attrValues
+    environment.systemPackages = (attrValues
       {
         # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
         inherit (pkgs)

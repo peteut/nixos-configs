@@ -60,6 +60,9 @@
           inherit (nixpkgs.lib) getName;
           pkgs = import nixpkgs {
             inherit system;
+            overlays = [
+              (import ./overlays/pianoteq.nix)
+            ];
             config = {
               allowUnfreePredicate = pkg:
                 elem (getName pkg) [
@@ -70,20 +73,22 @@
             };
           };
         in
-        nixpkgs.lib.nixosSystem {
-          inherit system pkgs;
-          modules = [
-            ./modules/system/configuration.nix
-            { networking.hostName = hostName; }
-          ] ++ modules;
-          specialArgs = {
-            inherit self inputs username;
-            pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+        nixpkgs.lib.nixosSystem
+          {
+            inherit system pkgs;
+            modules = [
+              ./modules/system/configuration.nix
+              { networking.hostName = hostName; }
+            ] ++ modules;
+            specialArgs = {
+              inherit self inputs username;
+              pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+            };
           };
-        };
 
     in
-    eachSystem [ x86_64-linux aarch64-linux ]
+    eachSystem
+      [ x86_64-linux aarch64-linux ]
       (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
