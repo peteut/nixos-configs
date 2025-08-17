@@ -22,6 +22,8 @@ in
       config.disable_default_key_bindings = true
       config.keys = {
         { key = 'L', mods = 'CTRL', action = wezterm.action.ShowDebugOverlay },
+        { key = 'c', mods = 'CTRL', action = wezterm.action.CopyTo 'Clipboard' },
+        { key = 'v', mods = 'CTRL', action = wezterm.action.PasteFrom 'Clipboard' },
       }
       config.leader = { key = "Space", mods = "CTRL", timeout_milliseconds = 1000 }
       require("${wezPainControl.path}.plugin").apply_to_config(config, {})
