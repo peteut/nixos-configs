@@ -1,7 +1,5 @@
-{ lib, osConfig, ... }:
+{ ... }:
 let
-  cfg = osConfig.modules.tex;
-  inherit (lib) mkIf;
   extraPackages = tpkgs: {
     inherit (tpkgs)
       scheme-tetex
@@ -12,7 +10,7 @@ let
   };
 in
 {
-  programs.texlive = mkIf cfg.enable {
+  programs.texlive = {
     enable = true;
     inherit extraPackages;
   };

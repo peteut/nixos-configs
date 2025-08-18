@@ -1,9 +1,7 @@
 { inputs, config, pkgs, pkgsUnstable, lib, username, host, ... }:
 let
   cfg = config.modules.user;
-  inherit (builtins) listToAttrs;
-  inherit (lib) mkEnableOption mkIf mkOption types getName;
-  inherit (lib.attrsets) nameValuePair;
+  inherit (lib) mkEnableOption mkIf mkOption types;
   inherit (lib.options) mkPackageOption;
 in
 {
@@ -14,13 +12,6 @@ in
     };
     editor = mkPackageOption pkgsUnstable "editor" {
       default = "helix";
-    };
-    programs = mkOption {
-      type = types.listOf types.package;
-      default = [ ];
-      description = ''
-        Programs configured by home-manager.
-      '';
     };
     packages = mkOption {
       type = types.listOf types.package;
@@ -51,12 +42,7 @@ in
           homeDirectory = "/home/${username}";
           packages = cfg.packages;
         };
-        programs = (listToAttrs
-          (map
-            (p: nameValuePair (getName p) { enable = true; })
-            cfg.programs)) // {
-          home-manager.enable = true;
-        };
+        programs.home-manager.enable = true;
       };
     };
 

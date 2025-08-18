@@ -33,7 +33,6 @@ in
     modules = {
       musnix.enable = true;
       tailscale.enable = true;
-      tex.enable = true;
       user = {
         enable = true;
         packages = attrValues {
