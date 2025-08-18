@@ -1,6 +1,10 @@
-{ ... }:
+{ lib, osConfig, ... }:
+let
+  cfg = osConfig.modules.hyprland;
+  inherit (lib) mkIf;
+in
 {
-  services.dunst = {
+  services.dunst = mkIf cfg.enable {
     enable = true;
     settings = {
       global = {

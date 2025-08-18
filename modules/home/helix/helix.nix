@@ -1,4 +1,4 @@
-{ osConfig, lib, pkgs, pkgsUnstable, ... }:
+{ lib, osConfig, pkgs, pkgsUnstable, ... }:
 let
   inherit (lib) mkIf concatMap;
   inherit (builtins) elem attrValues;

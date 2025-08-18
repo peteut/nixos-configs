@@ -1,4 +1,4 @@
-{ lib, osConfig, pkgs, ... }:
+{ lib, osConfig, ... }:
 let
   cfg = osConfig.modules.hyprland;
   inherit (lib) mkIf;

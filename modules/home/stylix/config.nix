@@ -1,9 +1,11 @@
-{ pkgs, ... }:
+{ lib, osConfig, pkgs, ... }:
 let
+  cfg = osConfig.modules.hyprland;
+  inherit (lib) mkIf;
   fontSize = 7;
 in
 {
-  stylix = {
+  stylix = mkIf cfg.enable {
     enable = true;
     targets."helix".enable = false;
     icons = {

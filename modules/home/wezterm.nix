@@ -1,5 +1,7 @@
-{ pkgs, ... }:
+{ lib, osConfig, pkgs, ... }:
 let
+  cfg = osConfig.modules.hyprland;
+  inherit (lib) mkIf;
   inherit (pkgs) fetchFromGitHub;
   wezPainControl = {
     path = "wez-pain-control";
@@ -12,7 +14,7 @@ let
   };
 in
 {
-  programs.wezterm = {
+  programs.wezterm = mkIf cfg.enable {
     enable = true;
     extraConfig = ''
       local config = wezterm.config_builder()

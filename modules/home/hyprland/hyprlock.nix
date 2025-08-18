@@ -1,6 +1,10 @@
-{ lib, ... }:
+{ lib, osConfig, ... }:
+let
+  cfg = osConfig.modules.hyprland;
+  inherit (lib) mkIf;
+in
 {
-  programs.hyprlock = {
+  programs.hyprlock = mkIf cfg.enable {
     enable = true;
     settings = {
       general = {

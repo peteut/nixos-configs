@@ -1,5 +1,11 @@
-{ ... }:
+{ config, lib, ... }:
+let
+  cfg = config.modules.hyprland;
+  inherit (lib) mkIf;
+in
 {
   # services.hypridle.enable = true;
-  security.pam.services.hyprlock = { };
+  config = mkIf cfg.enable {
+    security.pam.services.hyprlock = { };
+  };
 }
