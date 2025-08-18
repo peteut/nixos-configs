@@ -10,6 +10,7 @@
         do --env {
           $env.SSH_AUTH_SOCK = $"($env.XDG_RUNTIME_DIR)/ssh-agent"
         }
+        use std/dirs
       '';
       environmentVariables = config.home.sessionVariables //
         {
