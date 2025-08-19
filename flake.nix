@@ -10,7 +10,7 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL";
+      url = "github:nix-community/NixOS-WSL/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
