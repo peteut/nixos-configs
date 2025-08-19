@@ -26,9 +26,12 @@ in
         { key = 'L', mods = 'CTRL', action = wezterm.action.ShowDebugOverlay },
         { key = 'c', mods = 'CTRL|SHIFT', action = wezterm.action.CopyTo 'Clipboard' },
         { key = 'v', mods = 'CTRL|SHIFT', action = wezterm.action.PasteFrom 'Clipboard' },
+        { key = 'Enter', mods = 'ALT', action = wezterm.action.ToggleFullScreen },
       }
       config.leader = { key = "Space", mods = "CTRL", timeout_milliseconds = 1000 }
-      require("${wezPainControl.path}.plugin").apply_to_config(config, {})
+      require("${wezPainControl.path}.plugin").apply_to_config(config, {
+        pane_resize = 2,
+      })
       return config
     '';
   };
