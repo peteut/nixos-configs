@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }:
+{ lib, config, inputs, username, ... }:
 let
   cfg = config.modules.wsl;
   inherit (lib) mkEnableOption mkIf;
@@ -12,8 +12,9 @@ in
   config = mkIf cfg.enable {
     wsl = {
       enable = true;
+      usbip.enable = true;
       wslConf.automount.root = "/mnt";
-      defaultUser = "alain";
+      defaultUser = username;
       startMenuLaunchers = true;
     };
   };
