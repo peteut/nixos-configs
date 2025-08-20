@@ -13,7 +13,16 @@ in
     wsl = {
       enable = true;
       usbip.enable = true;
-      wslConf.automount.root = "/mnt";
+      wslConf = {
+        automount.root = "/mnt";
+        interop = {
+          enabled = false;
+          appendWindowsPath = false;
+        };
+        network = {
+          generateResolvConf = false;
+        };
+      };
       defaultUser = username;
       startMenuLaunchers = true;
     };
