@@ -29,6 +29,10 @@ in
       useRoutingFeatures = cfg.useRoutingFeatures;
     };
 
+    services.resolved = {
+      enable = true;
+    };
+
     networking.firewall = {
       enable = true;
       checkReversePath = "loose";

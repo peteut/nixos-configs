@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.modules.hyprland;
+  inherit (builtins) attrValues;
   inherit (lib) mkIf mkEnableOption;
   sddm-astronaut = pkgs.sddm-astronaut.override {
     embeddedTheme = "astronaut";
@@ -14,6 +15,13 @@ in
     programs.hyprland = {
       enable = true;
       withUWSM = true;
+    };
+    xdg.portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = attrValues {
+        inherit (pkgs) xdg-desktop-portal-gtk;
+      };
     };
     services.displayManager.sddm = {
       package = pkgs.kdePackages.sddm;

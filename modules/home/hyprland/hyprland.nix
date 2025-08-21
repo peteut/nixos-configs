@@ -10,6 +10,8 @@ in
   wayland.windowManager.hyprland = mkIf cfg.enable {
     enable = true;
     systemd.variables = [ "--all" ];
+    package = null;
+    portalPackage = null;
   };
   home.pointerCursor = mkIf cfg.enable {
     enable = true;
