@@ -58,6 +58,12 @@ in
           name = "markdown";
           language-servers = [ "marksman" "markdown-oxide" "typos" ];
         }
+        {
+          name = "c";
+          auto-format = true;
+          formatter.command = "clang-format";
+          language-servers = [ "clangd" "typos" ];
+        }
       ];
     };
   };
