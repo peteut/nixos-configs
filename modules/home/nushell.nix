@@ -27,6 +27,9 @@
         package = pkgsUnstable.carapace;
         enableNushellIntegration = true;
       };
+      starship = {
+        enableNushellIntegration = true;
+      };
     };
     services.ssh-agent = {
       enable = true;
