@@ -7,7 +7,7 @@
     ./git.nix
     ./lazygit.nix
     ./packages
-    ./nushell.nix
+    ./nushell
     ./starship.nix
     ./wezterm.nix
     ./hyprland
