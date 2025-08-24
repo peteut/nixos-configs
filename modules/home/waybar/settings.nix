@@ -23,7 +23,8 @@ let
     let selected = (echo $menu | wofi --dmenu --width 200 --height 300 --prompt "Power" | str trim)
     if $selected != "" {
       let action = ($choices | where label == $selected | get action | first)
-      ^sh -c $action
+      let cmd = $action | split words
+      run-external ...$cmd
     }
   '';
   powerMenuPath = "waybar/scripts/power-menu.nu";
