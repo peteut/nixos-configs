@@ -9,7 +9,7 @@ in
 {
   imports = [
     ../../modules
-    ../../modules/eee.nix
+    # ../../modules/eee.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     inputs.nixos-hardware.nixosModules.common-pc-laptop-ssd
@@ -20,11 +20,11 @@ in
       environment.systemPackages = attrValues {
         inherit (pkgs) sbctl;
       };
-      # Lanzaboote currently replaces the sytemd-boot module.
+      # Lanzaboote currently replaces the systemd-boot module.
       boot.loader.systemd-boot.enable = lib.mkForce false;
       boot.lanzaboote = {
         enable = true;
-        pkiBundle = "/etc/secureboot";
+        pkiBundle = "/var/lib/sbctl";
       };
     })
   ];
@@ -87,12 +87,6 @@ in
     networking.networkmanager.enable =
       true; # Easiest to use and most distros use this by default.
     systemd.services.NetworkManager-wait-online.enable = false;
-    programs.thunar = {
-      enable = true;
-      plugins = builtins.attrValues {
-        inherit (pkgs.xfce) thunar-archive-plugin thunar-volman;
-      };
-    };
 
     services = {
       tlp = {
@@ -160,18 +154,19 @@ in
         # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
         inherit (pkgs)
           gnumake
-          openvpn
-          tpm2-abrmd
-          tpm2-tools
-          unzip
-          xreader;
-        inherit (pkgs.xfce)
-          xfce4-volumed-pulse
-          xfce4-screenshooter
-          xfce4-cpufreq-plugin
-          xfce4-systemload-plugin
-          xfce4-pulseaudio-plugin
-          xfce4-sensors-plugin;
+          # openvpn
+          # tpm2-abrmd
+          # tpm2-tools
+          # unzip
+          # xreader
+          ;
+        # inherit (pkgs.xfce)
+        #   xfce4-volumed-pulse
+        #   xfce4-screenshooter
+        #   xfce4-cpufreq-plugin
+        #   xfce4-systemload-plugin
+        #   xfce4-pulseaudio-plugin
+        #   xfce4-sensors-plugin;
       });
     # Some programs need SUID wrappers, can be configured further or are
     # started in user sessions.

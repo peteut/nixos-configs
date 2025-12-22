@@ -2,26 +2,27 @@
 let inherit (builtins) attrValues;
 in
 {
-  programs.git = {
-    enable = true;
-
-    userName = "Alain Péteut";
-    userEmail = "alain.peteut@spacetek.ch";
-
-    extraConfig = {
-      init.defaultBranch = "main";
-      core.autocrlf = "input";
-      merge.conflictstyle = "diff3";
-      diff.colorMoved = "default";
-      pull.ff = "only";
-      color.ui = true;
-      url = {
-        "git@github.com:".insteadOf = "https://github.com/";
-        "git@gitlab.spacetek.ch:".insteadOf = "https://gitlab.spacetek.ch/";
+  programs = {
+    git = {
+      enable = true;
+      settings = {
+        user = {
+          name = "Alain Péteut";
+          email = "alain.peteut@spacetek.ch";
+        };
+        init.defaultBranch = "main";
+        core.autocrlf = "input";
+        merge.conflictstyle = "diff3";
+        diff.colorMoved = "default";
+        pull.ff = "only";
+        color.ui = true;
+        url = {
+          "git@github.com:".insteadOf = "https://github.com/";
+          "git@gitlab.spacetek.ch:".insteadOf = "https://gitlab.spacetek.ch/";
+        };
+        core.excludesFile = "/home/${username}/.config/git/.gitignore";
       };
-      core.excludesFile = "/home/${username}/.config/git/.gitignore";
     };
-
     delta = {
       enable = true;
       options = {
@@ -32,6 +33,7 @@ in
       };
     };
   };
+
 
   home.packages = attrValues { inherit (pkgs) gh; };
 }

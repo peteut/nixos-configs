@@ -2,7 +2,7 @@
   description = "My deploy-rs config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
     pre-commit-hooks = {
@@ -10,13 +10,12 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/release-25.05";
+      url = "github:nix-community/NixOS-WSL/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.2";
+      url = "github:nix-community/lanzaboote/v1.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.pre-commit-hooks-nix.follows = "pre-commit-hooks";
     };
     deploy-rs = {
       url = "github:serokell/deploy-rs";
@@ -27,11 +26,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
-      url = "github:danth/stylix/release-25.05";
+      url = "github:danth/stylix/release-25.11";
     };
   };
 
@@ -88,7 +87,10 @@
       (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        inherit (builtins) attrValues mapAttrs;
+        inherit (builtins)
+          attrValues
+          mapAttrs
+          ;
       in
       {
         checks = {
@@ -108,8 +110,8 @@
         devShells.default = pkgs.mkShell
           {
             buildInputs = attrValues {
-              inherit (deploy-rs.packages.${system}) deploy-rs;
               inherit (pkgs)
+                deploy-rs
                 nixpkgs-fmt
                 nil
                 nixd
@@ -131,6 +133,9 @@
           ./hosts/desktop/configuration.nix
         ];
         ws-10 = mkSystem "ws-10" x86_64-linux [
+          ./hosts/desktop/configuration.nix
+        ];
+        ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];
       };
@@ -190,6 +195,18 @@
             profiles = {
               system = system {
                 path = activate.nixos cfg.ws-10;
+                magicRollback = false;
+                autoRollback = false;
+                fastConnection = false;
+                remoteBuild = true;
+              };
+            };
+          };
+          ws-27 = {
+            hostname = tailscaleHostname "nixos";
+            profiles = {
+              system = system {
+                path = activate.nixos cfg.ws-27;
                 magicRollback = false;
                 autoRollback = false;
                 fastConnection = false;

@@ -1,0 +1,6 @@
+{ ... }:
+{
+  programs.sioyek = {
+    enable = true;
+  };
+}

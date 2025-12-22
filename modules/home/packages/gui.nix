@@ -13,7 +13,6 @@ in
       calibre
       remmina
       slack
-      # teams
       joplin-desktop
       # }}}
       ;
