@@ -14,6 +14,9 @@ in
       # filemanager {{{
       yazi
       # }}}
+      # nix helper {{{
+      nh
+      # }}}
       ;
   };
 }
