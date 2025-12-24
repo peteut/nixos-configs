@@ -80,6 +80,7 @@ in
 
     services.dnsmasq = {
       enable = true;
+      resolveLocalQueries = true;
       settings = {
         server = [ "${routerIP}" "/${tailscaleNet}/${magicDNS}" ];
         dhcp-range = [ "192.168.1.100,192.168.1.199,255.255.255.0,12h" ];

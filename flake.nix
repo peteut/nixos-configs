@@ -203,7 +203,7 @@
             };
           };
           ws-27 = {
-            hostname = tailscaleHostname "nixos";
+            hostname = tailscaleHostname "ws-27";
             profiles = {
               system = system {
                 path = activate.nixos cfg.ws-27;
