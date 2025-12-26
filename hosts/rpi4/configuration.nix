@@ -5,6 +5,7 @@
 { pkgs, modulesPath, inputs, ... }:
 let
   routerIP = "192.168.1.1";
+  cloudflareDNS = [ "1.1.1.1" "1.0.0.1" ];
   myIP = "192.168.1.2";
   magicDNS = "100.100.100.100";
   tailscaleNet = "tail1968e.ts.net";
@@ -82,7 +83,7 @@ in
       enable = true;
       resolveLocalQueries = true;
       settings = {
-        server = [ "${routerIP}" "/${tailscaleNet}/${magicDNS}" ];
+        server = cloudflareDNS ++ [ "/${tailscaleNet}/${magicDNS}" ];
         dhcp-range = [ "192.168.1.100,192.168.1.199,255.255.255.0,12h" ];
         bogus-priv = true;
         filterwin2k = true;
