@@ -12,12 +12,14 @@
           show_banner = false;
         };
         extraConfig = ''
-          do --env {
-            $env.SSH_AUTH_SOCK = $"($env.XDG_RUNTIME_DIR? | default $"/run/user/(id -u)")/ssh-agent"
-          }
           use std/dirs
 
           ${init}
+        '';
+        extraEnv = ''
+          do --env {
+            $env.XDG_RUNTIME_DIR = $"($env.XDG_RUNTIME_DIR? | default $"/run/user/(id -u)")"
+          }
         '';
         environmentVariables = config.home.sessionVariables //
           {
