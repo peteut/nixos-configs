@@ -16,6 +16,7 @@ in
       type = types.lines;
       example = [ "--ssh" ];
     };
+    resolved = mkEnableOption "resolved";
   };
 
   config = mkIf cfg.enable {
@@ -30,7 +31,7 @@ in
     };
 
     services.resolved = {
-      enable = true;
+      enable = cfg.resolved;
     };
 
     networking.firewall = {

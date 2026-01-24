@@ -49,6 +49,7 @@ in
         enable = true;
         extraUpFlags = [ "--ssh" "--advertise-exit-node" ];
         useRoutingFeatures = "server";
+        resolved = false;
       };
     };
 
