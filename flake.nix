@@ -132,9 +132,6 @@
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];
-        ws-10 = mkSystem "ws-10" x86_64-linux [
-          ./hosts/desktop/configuration.nix
-        ];
         ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ];
@@ -187,18 +184,6 @@
                 autoRollback = false;
                 fastConnection = true;
                 remoteBuild = false;
-              };
-            };
-          };
-          ws-10 = {
-            hostname = tailscaleHostname "ws-10";
-            profiles = {
-              system = system {
-                path = activate.nixos cfg.ws-10;
-                magicRollback = false;
-                autoRollback = false;
-                fastConnection = false;
-                remoteBuild = true;
               };
             };
           };
