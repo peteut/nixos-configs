@@ -16,7 +16,7 @@ in
       type = types.lines;
       example = [ "--ssh" ];
     };
-    resolved = mkEnableOption "resolved";
+    resolved = mkOption { default = true; example = false; type = types.bool; };
   };
 
   config = mkIf cfg.enable {
