@@ -32,6 +32,10 @@
     stylix = {
       url = "github:danth/stylix/release-25.11";
     };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
