@@ -44,6 +44,7 @@ in
         enableBT = true;
       };
       hyprland.enable = true;
+      microvm.enable = true;
     };
 
     services.udev.extraRules = ''
@@ -74,7 +75,6 @@ in
     '';
 
     # Use the systemd-boot EFI boot loader.
-    boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
     boot.initrd.luks.devices."lvm".device = "/dev/disk/by-uuid/063d8986-03e5-43d2-be6e-42d3092c12d5";

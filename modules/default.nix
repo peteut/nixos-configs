@@ -7,5 +7,6 @@
     ./pipewire.nix
     ./user.nix
     ./hyprland.nix
+    ./microvm.nix
   ];
 }
