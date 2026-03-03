@@ -122,6 +122,14 @@
             deploy-rs.lib.${system});
         };
 
+        packages.devvm = import ./microvm/dev.nix
+          {
+            inherit (inputs) microvm;
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            hostName = "test-devvm";
+          };
+
         devShells.default = pkgs.mkShell
           {
             buildInputs = attrValues {

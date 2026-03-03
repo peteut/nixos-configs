@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }:
+{ pkgs, lib, config, inputs, ... }:
 let
   cfg = config.modules.microvm;
   inherit (lib) mkEnableOption mkIf mkOption;
@@ -21,6 +21,10 @@ in
       microvm.host.enable = cfg.enable;
     }
     (mkIf cfg.enable {
+      environment.systemPackages = builtins.attrValues {
+        inherit (pkgs) virtiofsd
+          ;
+      };
       networking =
         {
           bridges."${brName}".interfaces = [
@@ -35,6 +39,25 @@ in
             inherit (cfg) externalInterface;
           };
         };
+      # Automatically attach any *-tap interface to the bridge via udev
+      services.udev.extraRules = ''
+        ACTION=="add", SUBSYSTEM=="net", KERNEL=="*-tap", \
+          RUN+="${pkgs.iproute2}/bin/ip link set %k master ${brName}"
+      '';
+      # DNS for VMs: forward to systemd-resolved stub.
+      services.dnsmasq = {
+        enable = true;
+        settings = {
+          interface = brName;
+          bind-interfaces = true;
+          no-resolv = true;
+          server = [ "127.0.0.53" ];
+        };
+      };
+      networking.firewall.interfaces."${brName}" = {
+        allowedUDPPorts = [ 53 ];
+        allowedTCPPorts = [ 53 ];
+      };
     })
   ];
 }

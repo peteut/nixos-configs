@@ -44,7 +44,10 @@ in
         enableBT = true;
       };
       hyprland.enable = true;
-      microvm.enable = true;
+      microvm = {
+        enable = true;
+        externalInterface = "wlp0s20f3";
+      };
     };
 
     services.udev.extraRules = ''
