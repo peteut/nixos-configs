@@ -36,6 +36,15 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell/v4.6.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.noctalia-qs.follows = "noctalia-qs";
+    };
+    noctalia-qs = {
+      url = "github:noctalia-dev/noctalia-qs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -77,7 +86,9 @@
             inherit system pkgs;
             modules = [
               ./modules/system/configuration.nix
-              { networking.hostName = hostName; }
+              {
+                networking.hostName = hostName;
+              }
             ] ++ modules;
             specialArgs = {
               inherit self inputs username;

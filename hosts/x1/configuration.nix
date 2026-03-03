@@ -111,6 +111,7 @@ in
       fwupd.enable = true;
       # Configure keymap in X11
       xserver.xkb.layout = "ch";
+      upower.enable = true;
     };
 
     hardware = {

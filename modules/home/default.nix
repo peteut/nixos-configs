@@ -19,5 +19,6 @@
     ./tex.nix
     ./sioyek.nix
     ./helix
+    ./noctalia.nix
   ];
 }
