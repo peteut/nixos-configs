@@ -36,6 +36,10 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    claude-code-nix = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell/v4.6.1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -62,23 +66,30 @@
 
       username = "alain";
 
-      mkSystem = hostName: system: modules:
+      mkPkgs =
         let
           inherit (builtins) elem;
           inherit (nixpkgs.lib) getName;
-          pkgs = import nixpkgs {
+        in
+        { system, extraOverlays ? [ ], extraUnfree ? [ ] }: import nixpkgs {
+          inherit system;
+          overlays = [
+            (import ./overlays/pianoteq.nix)
+            inputs.claude-code-nix.overlays.default
+          ] ++ extraOverlays;
+          config.allowUnfreePredicate = pkg:
+            elem (getName pkg) ([
+              "google-chrome"
+              "slack"
+              "pianoteq-stage"
+              "claude-code"
+            ] ++ extraUnfree);
+        };
+
+      mkSystem = hostName: system: modules:
+        let
+          pkgs = mkPkgs {
             inherit system;
-            overlays = [
-              (import ./overlays/pianoteq.nix)
-            ];
-            config = {
-              allowUnfreePredicate = pkg:
-                elem (getName pkg) [
-                  "google-chrome"
-                  "slack"
-                  "pianoteq-stage"
-                ];
-            };
           };
         in
         nixpkgs.lib.nixosSystem
@@ -101,11 +112,14 @@
       [ x86_64-linux aarch64-linux ]
       (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = mkPkgs {
+          inherit system;
+        };
         inherit (builtins)
           attrValues
           mapAttrs
           ;
+
       in
       {
         checks = {

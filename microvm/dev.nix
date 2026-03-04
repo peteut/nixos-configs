@@ -55,6 +55,7 @@ let
           htop
           iproute2
           iputils
+          claude-code
           ;
       }) ++ extraPkgs;
 

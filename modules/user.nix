@@ -49,7 +49,7 @@ in
     users.users.${username} = {
       isNormalUser = true;
       description = "${username}";
-      extraGroups = [ "networkmanager" "wheel" "audio" "dialout" ];
+      extraGroups = [ "networkmanager" "wheel" "audio" "dialout" "kvm" ];
       shell = cfg.shell;
     };
   };
