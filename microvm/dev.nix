@@ -1,4 +1,15 @@
-{ microvm, lib, pkgs, hostName ? "microVM", shares ? [ ], vcpu ? 8, mem ? 4096, extraPkgs ? [ ] }:
+{ microvm
+, lib
+, pkgs
+, hostName ? "microVM"
+, shares ? [ ]
+, vcpu ? 8
+, mem ? 4096
+, extraPkgs ? [ ]
+, user
+, uid ? 1000
+, authorizedKeys ? [ ]
+}:
 let
   hypervisor = "cloud-hypervisor";
   # Hash the hostname to get a deterministic seed
@@ -34,6 +45,18 @@ let
     services.getty.helpLine = ''
       Log in as "root" with an empty password.
     '';
+
+    users.users.${user} = {
+      inherit uid;
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+      openssh.authorizedKeys.keys = authorizedKeys;
+    };
+
+    services.openssh = {
+      enable = true;
+      settings.PermitRootLogin = "no";
+    };
 
     networking = {
       useNetworkd = true;

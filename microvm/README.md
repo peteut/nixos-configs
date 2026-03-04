@@ -58,7 +58,7 @@ devenv up
 
 ## Claude Code authentication
 
-Claude Code requires `ANTHROPIC_API_KEY`. secretspec separates secret *declaration* from storage; each developer connects their preferred backend (system keyring, 1Password, dotenvx, etc.).
+Claude Code requires `ANTHROPIC_API_KEY`. secretspec separates secret _declaration_ from storage; each developer connects their preferred backend (system keyring, 1Password, dotenvx, etc.).
 
 `secretspec` must be present in the devenv shell:
 
@@ -109,6 +109,8 @@ packages.devvm = import ./microvm/dev.nix {
   inherit pkgs;
   inherit (nixpkgs) lib;
   hostName = "devvm";
+  user = username;
+  authorizedKeys = [ "ssh-ed25519 AAAA..." ];
   shares = [{
     tag = "anthropic-key";
     source = "/home/${username}/.config/anthropic";
