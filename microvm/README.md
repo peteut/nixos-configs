@@ -4,28 +4,47 @@ A NixOS microvm pre-configured for development, including Claude Code.
 
 ## Host requirements
 
-The NixOS host must have the `modules.microvm` module enabled, e.g.:
+The NixOS host must have the `modules.microvm` module enabled. To use it from a separate NixOS configs project, add this repo and `microvm.nix` as flake inputs, then import the module:
 
 ```nix
-modules.microvm = {
-  enable = true;
-  externalInterface = "wlp0s20f3"; # adjust to your uplink
-};
+# flake.nix
+{
+  inputs = {
+    nixos-configs = {
+      url = "github:peteut/nixos-configs";
+      flake = false;
+    };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { self, nixpkgs, nixos-configs, ... }@inputs: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = { inherit inputs; }; # required: module uses inputs.microvm
+      modules = [
+        "${nixos-configs}/modules/microvm.nix"
+        {
+          modules.microvm = {
+            enable = true;
+            externalInterface = "eth0"; # adjust to your uplink
+          };
+        }
+      ];
+    };
+  };
+}
 ```
 
 This creates the `microbr` bridge, configures NAT, and auto-attaches tap interfaces.
 
 ## devenv.sh setup
 
-Add [devenv](https://devenv.sh) to your flake inputs and define the VM as a process:
+See [devenv.sh](https://devenv.sh) for installation and setup. Define the VM as a process in `devenv.nix`:
 
 ```nix
-# flake.nix (inputs)
-devenv.url = "github:cachix/devenv";
-```
-
-```nix
-# devenv.nix
 { pkgs, config, ... }: {
   processes.devvm.exec = "${pkgs.lib.getExe pkgs.nix} run path:.#devvm";
 }
