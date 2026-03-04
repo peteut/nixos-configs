@@ -47,6 +47,10 @@ in
       microvm = {
         enable = true;
         externalInterface = "wlp0s20f3";
+        dnsFilter = {
+          enable = true;
+          whitelistFile = ../../microvm/dns-whitelist.txt;
+        };
       };
     };
 

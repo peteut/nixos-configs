@@ -1,0 +1,68 @@
+# Title:       microvm DNS whitelist
+# Description: Domains that microvm guests are allowed to resolve.
+#              Subdomains are automatically included by dnsmasq.
+# Format:      One domain per line.  Lines starting with # are comments.
+#              Blank lines are ignored.  Comments must start at column 0.
+#
+# Usage in host config:
+#
+#   modules.microvm.dnsFilter = {
+#     enable = true;
+#     whitelistFile = ./microvm/dns-whitelist.txt;
+#   };
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Nix / NixOS
+# ══════════════════════════════════════════════════════════════════════════════
+nixos.org
+nix-community.org
+cachix.org
+cachix.io
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Claude Code  (api, feature-flags, error reporting)
+# ══════════════════════════════════════════════════════════════════════════════
+anthropic.com
+statsig.com
+sentry.io
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Source forges
+# ══════════════════════════════════════════════════════════════════════════════
+github.com
+githubusercontent.com
+githubassets.com
+gitlab.com
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Language package registries
+# ══════════════════════════════════════════════════════════════════════════════
+# Python
+pypi.org
+pythonhosted.org
+
+# Node / JS
+npmjs.com
+npmjs.org
+
+# Rust
+crates.io
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CDN / infrastructure
+# ══════════════════════════════════════════════════════════════════════════════
+cloudflare.com
+fastly.net
+akamaiedge.net
+amazonaws.com
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Time
+# ══════════════════════════════════════════════════════════════════════════════
+pool.ntp.org
