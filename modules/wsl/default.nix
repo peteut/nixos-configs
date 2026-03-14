@@ -21,6 +21,7 @@ in
         };
         network = {
           generateResolvConf = false;
+          generateHosts = false;
         };
       };
       defaultUser = username;
