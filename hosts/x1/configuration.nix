@@ -52,6 +52,7 @@ in
           whitelistFile = ../../microvm/dns-whitelist.txt;
         };
       };
+      flatpak.enable = true;
     };
 
     services.udev.extraRules = ''
