@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./flatpak.nix
     ./musnix.nix
     ./tailscale.nix
     ./security.nix

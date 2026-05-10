@@ -5,7 +5,7 @@ let
 in
 {
   programs.wofi = mkIf cfg.enable {
-    enable = true;
+    enable = false;
     style = ''
       * {
         font-family: monspace;

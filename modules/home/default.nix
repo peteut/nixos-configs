@@ -2,6 +2,7 @@
 {
   imports = [
     ./browser.nix
+    ./flatpak.nix
     ./zsh.nix
     ./btop.nix
     ./git.nix

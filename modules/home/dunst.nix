@@ -5,7 +5,7 @@ let
 in
 {
   services.dunst = mkIf cfg.enable {
-    enable = true;
+    enable = false;
     settings = {
       global = {
         origin = "top-left";

@@ -156,27 +156,11 @@ in
       rtkit.enable = true;
     };
 
-    # List packages installed in system profile. To search, run:
-    # $ nix search wget
-    environment.systemPackages = (attrValues
-      {
-        # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-        inherit (pkgs)
-          gnumake
-          # openvpn
-          # tpm2-abrmd
-          # tpm2-tools
-          # unzip
-          # xreader
-          ;
-        # inherit (pkgs.xfce)
-        #   xfce4-volumed-pulse
-        #   xfce4-screenshooter
-        #   xfce4-cpufreq-plugin
-        #   xfce4-systemload-plugin
-        #   xfce4-pulseaudio-plugin
-        #   xfce4-sensors-plugin;
-      });
+    virtualisation.waydroid = {
+      enable = true;
+      package = pkgs.waydroid-nftables;
+    };
+
     # Some programs need SUID wrappers, can be configured further or are
     # started in user sessions.
     # programs.mtr.enable = true;
@@ -198,7 +182,7 @@ in
     };
 
     services.fprintd.enable = true;
-    services.printing.enable = true;
+    # services.printing.enable = true;
     services.avahi = {
       enable = true;
       nssmdns4 = true;

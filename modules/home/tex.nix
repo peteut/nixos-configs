@@ -11,7 +11,7 @@ let
 in
 {
   programs.texlive = {
-    enable = true;
+    enable = false;
     inherit extraPackages;
   };
 }

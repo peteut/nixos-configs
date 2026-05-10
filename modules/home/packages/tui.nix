@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable, ... }:
 let
   inherit (builtins) attrValues;
 in
@@ -16,6 +16,11 @@ in
       # }}}
       # nix helper {{{
       nh
+      # }}}
+      ;
+    inherit (pkgsUnstable)
+      # devenv {{{
+      devenv
       # }}}
       ;
   };

@@ -136,7 +136,7 @@
                 nix-linter.enable = false;
                 stylua.enable = true;
                 dprint = {
-                  enable = true;
+                  enable = false;
                   description = "dprint formatter";
                   types = [ "text" ];
                   language = "system";
@@ -187,7 +187,7 @@
           ./hosts/desktop/configuration.nix
         ];
         ws-27 = mkSystem "ws-27" x86_64-linux [
-          ./hosts/desktop/configuration.nix
+          ./hosts/ws-27/configuration.nix
         ];
       };
 

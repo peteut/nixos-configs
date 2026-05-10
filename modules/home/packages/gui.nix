@@ -7,7 +7,6 @@ in
     inherit (pkgs)
       # Multimedia {{{
       pavucontrol
-      qpwgraph
       # }}}
       # Office {{{
       calibre
