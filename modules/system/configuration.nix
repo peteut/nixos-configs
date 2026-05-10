@@ -6,6 +6,8 @@ in
   boot.tmp = {
     useTmpfs = true;
   };
+  # https://blog.cloudlinux.com/cve-2026-31431-copy-fail-mitigation-and-patches
+  boot.kernelParams = [ "initcall_blacklist=algif_aead_init" ];
   # Set your time zone.
   time.timeZone = "Europe/Zurich";
   # Select internationalisation properties.
