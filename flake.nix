@@ -70,28 +70,47 @@
 
       mkPkgs =
         let
-          inherit (builtins) elem;
+          inherit (builtins) elem removeAttrs;
           inherit (nixpkgs.lib) getName;
         in
-        { system, extraOverlays ? [ ], extraUnfree ? [ ] }: import nixpkgs {
+        { system, extraOverlays ? [ ], extraUnfree ? [ ], extraUnfreePredicate ? (_: false), extraConfig ? { } }: import nixpkgs {
           inherit system;
           overlays = [
             (import ./overlays/pianoteq.nix)
             inputs.claude-code-nix.overlays.default
           ] ++ extraOverlays;
-          config.allowUnfreePredicate = pkg:
-            elem (getName pkg) ([
-              "google-chrome"
-              "slack"
-              "pianoteq-stage"
-              "claude-code"
-            ] ++ extraUnfree);
+          config = {
+            allowUnfreePredicate = pkg:
+              elem (getName pkg)
+                ([
+                  "google-chrome"
+                  "slack"
+                  "pianoteq-stage"
+                  "claude-code"
+                ] ++ extraUnfree) || extraUnfreePredicate pkg;
+          } // (removeAttrs extraConfig [ "allowUnfreePredicate" ]);
         };
 
-      mkSystem = hostName: system: modules:
+      mkSystem = hostName: system: modules: { cuda ? false }:
         let
+          inherit (nixpkgs.lib) optionalAttrs;
+          extraConfig = optionalAttrs cuda {
+            cudaCapabilities = [ "6.1" ];
+            cudaForwardCompat = false;
+            cudaSupport = true;
+            packageOverrides = p: {
+              cudaPackages = p.cudaPackages.overrideScope (final: prev: {
+                cudnn = prev.cudnn.overrideAttrs (_: {
+                  meta.badPlatforms = [ ];
+                });
+              });
+            };
+          };
+          extraUnfreePredicate = if cuda then nixpkgs.legacyPackages.${system}._cuda.lib.allowUnfreeCudaPredicate else (_: false);
+
           pkgs = mkPkgs {
             inherit system;
+            inherit extraUnfreePredicate extraConfig;
           };
         in
         nixpkgs.lib.nixosSystem
@@ -185,7 +204,8 @@
         ];
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
-        ];
+        ]
+          { cuda = true; };
         ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/ws-27/configuration.nix
         ];
@@ -237,7 +257,7 @@
                 magicRollback = false;
                 autoRollback = false;
                 fastConnection = true;
-                remoteBuild = false;
+                remoteBuild = true;
               };
             };
           };
