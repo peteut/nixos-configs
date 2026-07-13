@@ -5,7 +5,7 @@ let
 in
 {
   services.wlsunset = mkIf cfg.enable {
-    enable = true;
+    enable = false;
     latitude = 47;
     longitude = 7;
   };

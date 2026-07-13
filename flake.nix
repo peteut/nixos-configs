@@ -2,7 +2,7 @@
   description = "My deploy-rs config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
     git-hooks = {
@@ -10,7 +10,7 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/release-25.11";
+      url = "github:nix-community/NixOS-WSL/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
@@ -26,11 +26,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
-      url = "github:danth/stylix/release-25.11";
+      url = "github:danth/stylix/release-26.05";
     };
     microvm = {
       url = "github:microvm-nix/microvm.nix";
@@ -198,17 +198,20 @@
       nixosConfigurations = {
         rpi4 = mkSystem "rpi4" aarch64-linux [
           ./hosts/rpi4/configuration.nix
-        ];
+        ]
+          { };
         x1 = mkSystem "x1" x86_64-linux [
           ./hosts/x1/configuration.nix
-        ];
+        ]
+          { };
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ]
           { cuda = true; };
         ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/ws-27/configuration.nix
-        ];
+        ]
+          { };
       };
 
       deploy.nodes =
