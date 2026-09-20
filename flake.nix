@@ -70,7 +70,7 @@
 
       mkPkgs =
         let
-          inherit (builtins) elem removeAttrs;
+          inherit (builtins) elem;
           inherit (nixpkgs.lib) getName;
         in
         { system, extraOverlays ? [ ], extraUnfree ? [ ], extraUnfreePredicate ? (_: false), extraConfig ? { } }: import nixpkgs {
@@ -242,7 +242,7 @@
             };
           };
           x1 = {
-            hostname = "x1";
+            hostname = tailscaleHostname "x1";
             profiles = {
               system = system {
                 path = activate.nixos cfg.x1;

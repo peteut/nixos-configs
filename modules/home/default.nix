@@ -21,5 +21,6 @@
     ./sioyek.nix
     ./helix
     ./noctalia.nix
+    ./thunderbird.nix
   ];
 }

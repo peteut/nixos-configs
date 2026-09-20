@@ -2,7 +2,7 @@
 let
   terminal = "wezterm";
   splitToLines = s: lib.splitString "\n" s;
-  browser = "google-chrome-stable";
+  browser = "librewolf";
   uwsmPrefix = "uwsm app --";
   wofiLauncher = ''$(wofi --show drun --define=drun-print_desktop_file=true | sed -E "s/(\.desktop) /\1:/")'';
 in
@@ -10,6 +10,7 @@ in
   gtk.enable = true;
   qt.enable = true;
   wayland.windowManager.hyprland = {
+    configType = "hyprlang";
     settings = {
       exec-once = splitToLines ''
         [workspace 1 silent] ${uwsmPrefix} ${browser}
