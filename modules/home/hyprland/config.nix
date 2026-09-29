@@ -3,6 +3,7 @@ let
   terminal = "wezterm";
   splitToLines = s: lib.splitString "\n" s;
   browser = "librewolf";
+  shell = "noctalia-shell";
   uwsmPrefix = "uwsm app --";
   wofiLauncher = ''$(wofi --show drun --define=drun-print_desktop_file=true | sed -E "s/(\.desktop) /\1:/")'';
 in
@@ -13,6 +14,7 @@ in
     configType = "hyprlang";
     settings = {
       exec-once = splitToLines ''
+        ${uwsmPrefix} ${shell}
         [workspace 1 silent] ${uwsmPrefix} ${browser}
         [workspace 2 silent] ${uwsmPrefix} ${terminal}
       '';
