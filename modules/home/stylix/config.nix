@@ -8,6 +8,8 @@ in
   stylix = mkIf cfg.enable {
     enable = true;
     targets."helix".enable = false;
+    # v4-only target, superseded by ./noctalia.nix
+    targets.noctalia-shell.enable = false;
     icons = {
       enable = true;
       package = pkgs.papirus-icon-theme;

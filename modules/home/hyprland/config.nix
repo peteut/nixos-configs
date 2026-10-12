@@ -5,7 +5,7 @@ let
   browser = "librewolf";
   shell = "noctalia";
   uwsmPrefix = "uwsm app --";
-  wofiLauncher = ''$(wofi --show drun --define=drun-print_desktop_file=true | sed -E "s/(\.desktop) /\1:/")'';
+  ipc = "noctalia msg";
 in
 {
   gtk.enable = true;
@@ -37,8 +37,10 @@ in
         "SUPER, F, fullscreen, 0"
         "SUPER SHIFT, F, fullscreen, 1"
         "SUPER, Space, exec, ${uwsmPrefix} togglefloating"
-        "ALT, Escape, exec, ${uwsmPrefix} loginctl lock-session"
-        "SUPER, R, exec, ${uwsmPrefix} ${wofiLauncher}"
+        "ALT, Escape, exec, loginctl lock-session"
+        "SUPER, R, exec, ${ipc} panel-toggle launcher"
+        "SUPER, S, exec, ${ipc} panel-toggle control-center"
+        "SUPER, comma, exec, ${ipc} settings-toggle"
 
         # switch focus
         "SUPER, h, movefocus, l"
@@ -77,13 +79,13 @@ in
         "SUPER CTRL, c, movetoworkspace, empty"
 
         # Volume / brightness
-        ",XF86AudioRaiseVolume, exec, ${uwsmPrefix} pamixer -i 5"
-        ",XF86AudioLowerVolume, exec, ${uwsmPrefix} pamixer -d 5"
-        ",XF86AudioMute, exec, ${uwsmPrefix} pamixer -t"
-        ",XF86AudioMicMute, exec, ${uwsmPrefix} pamixer -m"
+        ",XF86AudioRaiseVolume, exec, ${ipc} volume-up"
+        ",XF86AudioLowerVolume, exec, ${ipc} volume-down"
+        ",XF86AudioMute, exec, ${ipc} volume-mute"
+        ",XF86AudioMicMute, exec, ${ipc} mic-mute"
 
-        ",XF86MonBrightnessUp, exec, ${uwsmPrefix} brightnessctl s 5%+"
-        ",XF86MonBrightnessDown, exec, ${uwsmPrefix} brightnessctl s 5%-"
+        ",XF86MonBrightnessUp, exec, ${ipc} brightness-up"
+        ",XF86MonBrightnessDown, exec, ${ipc} brightness-down"
       ];
 
       bindm = [
