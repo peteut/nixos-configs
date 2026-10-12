@@ -45,6 +45,10 @@
       url = "github:noctalia-dev/noctalia-shell/v5.2.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter/v1.6.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flatpak = {
       url = "github:gmodena/nix-flatpak/v0.7.0";
     };
