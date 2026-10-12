@@ -3,7 +3,7 @@ let
   terminal = "wezterm";
   splitToLines = s: lib.splitString "\n" s;
   browser = "librewolf";
-  shell = "noctalia-shell";
+  shell = "noctalia";
   uwsmPrefix = "uwsm app --";
   wofiLauncher = ''$(wofi --show drun --define=drun-print_desktop_file=true | sed -E "s/(\.desktop) /\1:/")'';
 in

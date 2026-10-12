@@ -7,7 +7,7 @@ in
   imports = [
     inputs.noctalia.homeModules.default
   ];
-  programs.noctalia-shell = mkIf cfg.enable
+  programs.noctalia = mkIf cfg.enable
     {
       enable = true;
       settings = {

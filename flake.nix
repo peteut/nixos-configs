@@ -30,7 +30,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
-      url = "github:danth/stylix/release-26.05";
+      url = "github:nix-community/stylix/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     microvm = {
       url = "github:microvm-nix/microvm.nix";
@@ -41,7 +42,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     noctalia = {
-      url = "github:noctalia-dev/noctalia-shell/v4.7.7";
+      url = "github:noctalia-dev/noctalia-shell/v5.2.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flatpak = {
@@ -202,7 +203,7 @@
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ]
-          { cuda = true; };
+          { cuda = false; };
         ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/ws-27/configuration.nix
         ]
@@ -233,6 +234,7 @@
                 magicRollback = false;
                 autoRollback = true;
                 fastConnection = false;
+                remoteBuild = false;
               };
             };
           };

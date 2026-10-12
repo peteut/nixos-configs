@@ -1,7 +1,7 @@
 { ... }:
-# let
-#   nameservers = [ "10.10.10.10" ];
-# in
+let
+  nameservers = [ "10.255.255.254" ];
+in
 {
   imports = [
     ../../modules
@@ -16,16 +16,23 @@
       };
       user = {
         enable = true;
+        ciRunner = true;
       };
       hyprland.enable = true;
     };
     boot.kernelModules = [ "tun" ];
-    # wsl.wslConf = {
-    #   network.hostname = "nixos-ws-27";
-    # };
-    # networking = {
-    #   inherit nameservers;
-    # };
+
+    networking =
+      {
+        inherit nameservers;
+        search = [ "spacetek.local" ];
+      };
+
+    fileSystems."/mnt/wsl/xilinx" = {
+      device = "/home/alain/Xilinx";
+      fsType = "none";
+      options = [ "bind" "ro" ];
+    };
   };
 }
 

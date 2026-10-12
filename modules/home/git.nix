@@ -17,7 +17,7 @@ in
         pull.ff = "only";
         color.ui = true;
         url = {
-          "git@github.com:".insteadOf = "https://github.com/";
+          "git@github.com:".pushInsteadOf = "https://github.com/";
           "git@gitlab.spacetek.ch:".insteadOf = "https://gitlab.spacetek.ch/";
         };
         core.excludesFile = "/home/${username}/.config/git/.gitignore";
