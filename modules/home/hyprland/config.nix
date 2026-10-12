@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, osConfig, ... }:
 let
   inherit (lib.generators) mkLuaInline toLua;
   lua = toLua { };
@@ -45,8 +45,8 @@ let
   };
 in
 {
-  gtk.enable = true;
-  qt.enable = true;
+  gtk.enable = osConfig.modules.hyprland.enable;
+  qt.enable = osConfig.modules.hyprland.enable;
   wayland.windowManager.hyprland = {
     configType = "lua";
     settings = {

@@ -1,12 +1,16 @@
-{ pkgs, ... }:
+{ lib, osConfig, pkgs, ... }:
 let
   inherit (builtins) attrValues;
 in
 {
-  home.packages = attrValues {
+  home.packages = lib.mkIf osConfig.modules.hyprland.enable (attrValues {
     inherit (pkgs)
       # Multimedia {{{
       pavucontrol
+      pamixer
+      # }}}
+      # Display {{{
+      brightnessctl
       # }}}
       # Office {{{
       calibre
@@ -15,6 +19,5 @@ in
       joplin-desktop
       # }}}
       ;
-  };
+  });
 }
-

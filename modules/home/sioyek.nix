@@ -1,6 +1,6 @@
-{ ... }:
+{ osConfig, ... }:
 {
   programs.sioyek = {
-    enable = true;
+    enable = osConfig.modules.hyprland.enable;
   };
 }

@@ -18,7 +18,6 @@ in
         enable = true;
         ciRunner = true;
       };
-      hyprland.enable = true;
     };
     boot.kernelModules = [ "tun" ];
 
