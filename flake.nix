@@ -94,17 +94,13 @@
       mkSystem = hostName: system: modules: { cuda ? false }:
         let
           inherit (nixpkgs.lib) optionalAttrs;
+          # Only *targets* CUDA builds at the GPU (Pascal, sm_61); CUDA itself
+          # is enabled per package. A global `cudaSupport` rebuilds every
+          # CUDA-capable package uncached. Pascal is supported up to CUDA 12.9
+          # and by cuDNN < 9.12 only.
           extraConfig = optionalAttrs cuda {
             cudaCapabilities = [ "6.1" ];
             cudaForwardCompat = false;
-            cudaSupport = true;
-            packageOverrides = p: {
-              cudaPackages = p.cudaPackages.overrideScope (final: prev: {
-                cudnn = prev.cudnn.overrideAttrs (_: {
-                  meta.badPlatforms = [ ];
-                });
-              });
-            };
           };
           extraUnfreePredicate = if cuda then nixpkgs.legacyPackages.${system}._cuda.lib.allowUnfreeCudaPredicate else (_: false);
 
@@ -207,7 +203,7 @@
         desktop = mkSystem "desktop" x86_64-linux [
           ./hosts/desktop/configuration.nix
         ]
-          { cuda = false; };
+          { cuda = true; };
         ws-27 = mkSystem "ws-27" x86_64-linux [
           ./hosts/ws-27/configuration.nix
         ]

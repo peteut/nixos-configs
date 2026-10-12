@@ -1,4 +1,4 @@
-{ ... }: {
+{ pkgs, ... }: {
   imports = [
     ../../modules
     ../../modules/wsl
@@ -16,5 +16,10 @@
       hyprland.enable = true;
     };
     boot.kernelModules = [ "tun" ];
+    # Expose the Windows host's NVIDIA driver (libcuda) via /run/opengl-driver.
+    wsl.useWindowsDriver = true;
+    environment.systemPackages = [
+      (pkgs.llama-cpp.override { cudaSupport = true; })
+    ];
   };
 }
