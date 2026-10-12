@@ -87,6 +87,27 @@ in
 
     boot.initrd.luks.devices."lvm".device = "/dev/disk/by-uuid/063d8986-03e5-43d2-be6e-42d3092c12d5";
 
+    # Graphical boot: firmware (ThinkPad) logo with a spinning NixOS logo,
+    # LUKS passphrase prompt inside the splash.
+    boot.plymouth = {
+      enable = true;
+      theme = "nixos-bgrt";
+      themePackages = [ pkgs.nixos-bgrt-plymouth ];
+    };
+    # systemd stage 1 so the LUKS prompt is rendered by Plymouth.
+    boot.initrd.systemd.enable = true;
+    # Ship the Swiss console keymap in the initrd for the passphrase prompt.
+    console.earlySetup = true;
+    # Keep kernel/initrd output from drawing over the splash.
+    boot.initrd.verbose = false;
+    boot.consoleLogLevel = 3;
+    boot.kernelParams = [
+      "quiet"
+      "splash"
+      "udev.log_level=3"
+      "rd.systemd.show_status=auto"
+    ];
+
     boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
     networking.hostName = "x1"; # Define your hostname.
