@@ -1,107 +1,166 @@
 { lib, ... }:
 let
+  inherit (lib.generators) mkLuaInline toLua;
+  lua = toLua { };
+
   terminal = "wezterm";
-  splitToLines = s: lib.splitString "\n" s;
   browser = "librewolf";
-  shell = "noctalia";
-  uwsmPrefix = "uwsm app --";
-  ipc = "noctalia msg";
+  uwsm = cmd: "uwsm app -- ${cmd}";
+  noctalia = cmd: "noctalia msg ${cmd}";
+
+  # Docked at work: two Dell U2414H left of the X1's panel.
+  dellLeft = "desc:Dell Inc. DELL U2414H X4J7181T1P4L";
+  dellRight = "desc:Dell Inc. DELL U2414H X4J7181T1P6L";
+
+  # hl.bind(key, action[, opts]); `action` is a raw Lua expression.
+  bind = key: action: { _args = [ key (mkLuaInline action) ]; };
+  bindOpts = key: action: opts: { _args = [ key (mkLuaInline action) opts ]; };
+  # hl.dsp.exec_cmd(cmd[, rule])
+  exec = cmd: "hl.dsp.exec_cmd(${lua cmd})";
+  execRule = cmd: rule: "hl.dsp.exec_cmd(${lua cmd}, ${lua rule})";
+  # Media/brightness keys keep working on the lock screen and auto-repeat.
+  mediaKey = { locked = true; repeating = true; };
+
+  # Move focus, then raise the window (former movefocus + alterzorder pair).
+  focusRaise = key: direction: bind "SUPER + ${key}" ''
+    function()
+      hl.dispatch(hl.dsp.focus({ direction = ${lua direction} }))
+      hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+    end'';
+
+  workspaceBinds = lib.concatMap
+    (i:
+      let key = toString (lib.mod i 10); in
+      [
+        (bind "SUPER + ${key}" "hl.dsp.focus({ workspace = ${toString i} })")
+        (bind "SUPER + SHIFT + ${key}"
+          "hl.dsp.window.move({ workspace = ${toString i}, follow = false })")
+      ])
+    (lib.range 1 10);
+
+  persistentWorkspace = monitor: i: {
+    workspace = toString i;
+    inherit monitor;
+    persistent = true;
+  };
 in
 {
   gtk.enable = true;
   qt.enable = true;
   wayland.windowManager.hyprland = {
-    configType = "hyprlang";
+    configType = "lua";
     settings = {
-      exec-once = splitToLines ''
-        ${uwsmPrefix} ${shell}
-        [workspace 1 silent] ${uwsmPrefix} ${browser}
-        [workspace 2 silent] ${uwsmPrefix} ${terminal}
-      '';
-      input = {
-        kb_layout = "ch";
+      monitor = [
+        { output = ""; mode = "preferred"; position = "auto"; scale = "1.0"; }
+        { output = dellLeft; mode = "1920x1080"; position = "0x120"; scale = "1.0"; }
+        { output = dellRight; mode = "1920x1080"; position = "1920x120"; scale = "1.0"; }
+        { output = "eDP-1"; mode = "1920x1200"; position = "3840x0"; scale = "1.2"; }
+      ];
+
+      config = {
+        input.kb_layout = "ch";
+        xwayland.force_zero_scaling = true;
+
+        # Look & feel recommended by Noctalia; border/shadow colours come
+        # from stylix.
+        general = {
+          layout = "dwindle";
+          gaps_in = 5;
+          gaps_out = 10;
+        };
+        decoration = {
+          rounding = 12;
+          rounding_power = 2;
+          shadow = {
+            enabled = true;
+            range = 4;
+            render_power = 3;
+          };
+          blur = {
+            enabled = true;
+            size = 3;
+            passes = 2;
+            vibrancy = 0.1696;
+          };
+        };
       };
 
-      general = {
-        layout = "dwindle";
+      # Pinned when docked; Hyprland falls back to an available monitor when
+      # a Dell is absent (laptop only).
+      workspace_rule =
+        map (persistentWorkspace dellLeft) [ 1 2 3 ]
+        ++ map (persistentWorkspace dellRight) [ 4 5 ];
+
+      window_rule = [
+        {
+          name = "noctalia-settings";
+          match.class = "dev.noctalia.Noctalia";
+          float = true;
+          size = [ 1080 920 ];
+        }
+      ];
+
+      # Blur Noctalia surfaces, leave animations to Noctalia itself.
+      layer_rule = [
+        {
+          name = "noctalia";
+          match.namespace =
+            "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$";
+          no_anim = true;
+          ignore_alpha = 0.5;
+          blur = true;
+          blur_popups = true;
+        }
+      ];
+
+      on = {
+        _args = [
+          "hyprland.start"
+          (mkLuaInline ''
+            function()
+              hl.exec_cmd(${lua (uwsm "noctalia")})
+              hl.exec_cmd(${lua (uwsm browser)}, { workspace = "1 silent" })
+              hl.exec_cmd(${lua (uwsm terminal)}, { workspace = "2 silent" })
+            end'')
+        ];
       };
 
       bind = [
-        "SUPER, F1, exec, show-keybinds"
-        "SUPER, Return, exec, ${terminal}"
+        (bind "SUPER + F1" (exec "show-keybinds"))
+        (bind "SUPER + Return" (exec terminal))
+        (bind "ALT + Return" (execRule (uwsm terminal) { float = true; size = [ 1111 700 ]; }))
+        (bind "SUPER + SHIFT + Return" (execRule (uwsm terminal) { fullscreen = true; }))
+        (bind "SUPER + B" (execRule (uwsm browser) { workspace = "1 silent"; }))
+        (bind "SUPER + Q" "hl.dsp.window.close()")
+        (bind "SUPER + F" ''hl.dsp.window.fullscreen({ mode = "fullscreen" })'')
+        (bind "SUPER + SHIFT + F" ''hl.dsp.window.fullscreen({ mode = "maximized" })'')
+        (bind "SUPER + Space" ''hl.dsp.window.float({ action = "toggle" })'')
+        (bind "ALT + Escape" (exec "loginctl lock-session"))
 
-        "ALT, Return, exec, [float; size 1111 700] ${uwsmPrefix} ${terminal}"
-        "SUPER SHIFT, Return, exec, [fullscreen] ${uwsmPrefix} ${terminal}"
-        "SUPER, B, exec, [workspace 1 silent] ${uwsmPrefix} ${browser}"
-        "SUPER, Q, killactive,"
-        "SUPER, F, fullscreen, 0"
-        "SUPER SHIFT, F, fullscreen, 1"
-        "SUPER, Space, exec, ${uwsmPrefix} togglefloating"
-        "ALT, Escape, exec, loginctl lock-session"
-        "SUPER, R, exec, ${ipc} panel-toggle launcher"
-        "SUPER, S, exec, ${ipc} panel-toggle control-center"
-        "SUPER, comma, exec, ${ipc} settings-toggle"
+        # Noctalia
+        (bind "SUPER + R" (exec (noctalia "panel-toggle launcher")))
+        (bind "SUPER + S" (exec (noctalia "panel-toggle control-center")))
+        (bind "SUPER + comma" (exec (noctalia "settings-toggle")))
+        (bind "ALT + Tab" (exec (noctalia "window-switcher hold")))
 
-        # switch focus
-        "SUPER, h, movefocus, l"
-        "SUPER, j, movefocus, d"
-        "SUPER, k, movefocus, u"
-        "SUPER, l, movefocus, r"
+        (focusRaise "h" "left")
+        (focusRaise "j" "down")
+        (focusRaise "k" "up")
+        (focusRaise "l" "right")
 
-        "SUPER, h, alterzorder, top"
-        "SUPER, j, alterzorder, top"
-        "SUPER, k, alterzorder, top"
-        "SUPER, l, alterzorder, top"
+        (bind "SUPER + CTRL + c" ''hl.dsp.window.move({ workspace = "empty" })'')
 
-        # switch workspace
-        "SUPER, 1, workspace, 1"
-        "SUPER, 2, workspace, 2"
-        "SUPER, 3, workspace, 3"
-        "SUPER, 4, workspace, 4"
-        "SUPER, 5, workspace, 5"
-        "SUPER, 6, workspace, 6"
-        "SUPER, 7, workspace, 7"
-        "SUPER, 8, workspace, 8"
-        "SUPER, 9, workspace, 9"
-        "SUPER, 0, workspace, 10"
+        (bindOpts "XF86AudioRaiseVolume" (exec (noctalia "volume-up")) mediaKey)
+        (bindOpts "XF86AudioLowerVolume" (exec (noctalia "volume-down")) mediaKey)
+        (bindOpts "XF86AudioMute" (exec (noctalia "volume-mute")) { locked = true; })
+        (bindOpts "XF86AudioMicMute" (exec (noctalia "mic-mute")) { locked = true; })
+        (bindOpts "XF86MonBrightnessUp" (exec (noctalia "brightness-up")) mediaKey)
+        (bindOpts "XF86MonBrightnessDown" (exec (noctalia "brightness-down")) mediaKey)
 
-        # same as above, but switch to the workspace
-        "SUPER SHIFT, 1, movetoworkspacesilent, 1" # movetoworkspacesilent
-        "SUPER SHIFT, 2, movetoworkspacesilent, 2"
-        "SUPER SHIFT, 3, movetoworkspacesilent, 3"
-        "SUPER SHIFT, 4, movetoworkspacesilent, 4"
-        "SUPER SHIFT, 5, movetoworkspacesilent, 5"
-        "SUPER SHIFT, 6, movetoworkspacesilent, 6"
-        "SUPER SHIFT, 7, movetoworkspacesilent, 7"
-        "SUPER SHIFT, 8, movetoworkspacesilent, 8"
-        "SUPER SHIFT, 9, movetoworkspacesilent, 9"
-        "SUPER SHIFT, 0, movetoworkspacesilent, 10"
-        "SUPER CTRL, c, movetoworkspace, empty"
-
-        # Volume / brightness
-        ",XF86AudioRaiseVolume, exec, ${ipc} volume-up"
-        ",XF86AudioLowerVolume, exec, ${ipc} volume-down"
-        ",XF86AudioMute, exec, ${ipc} volume-mute"
-        ",XF86AudioMicMute, exec, ${ipc} mic-mute"
-
-        ",XF86MonBrightnessUp, exec, ${ipc} brightness-up"
-        ",XF86MonBrightnessDown, exec, ${ipc} brightness-down"
-      ];
-
-      bindm = [
-        "SUPER, mouse:272, movewindow"
-        "SUPER, mouse:273, resizewindow"
-      ];
+        (bindOpts "SUPER + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
+        (bindOpts "SUPER + mouse:273" "hl.dsp.window.resize()" { mouse = true; })
+      ]
+      ++ workspaceBinds;
     };
-    extraConfig = ''
-      monitor = , preferred, auto, 1.0
-      monitor = desc:Dell Inc. DELL U2414H X4J7181T1P4L, 1920x1080, 0x120, 1.0
-      monitor = desc:Dell Inc. DELL U2414H X4J7181T1P6L, 1920x1080, 1920x120, 1.0
-      monitor = eDP-1, 1920x1200, 3840x0, 1.2
-
-      xwayland {
-        force_zero_scaling = true
-      }
-    '';
   };
 }

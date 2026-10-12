@@ -10,6 +10,8 @@ in
     targets."helix".enable = false;
     # v4-only target, superseded by ./noctalia.nix
     targets.noctalia-shell.enable = false;
+    # Noctalia draws the wallpaper; don't run hyprpaper alongside it.
+    targets.hyprland.hyprpaper.enable = false;
     icons = {
       enable = true;
       package = pkgs.papirus-icon-theme;

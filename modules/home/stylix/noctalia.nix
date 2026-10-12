@@ -8,6 +8,7 @@ let
   inherit (lib) mkIf;
   stylix = config.stylix;
   palette = "stylix";
+  scale = 0.7;
 in
 {
   config = mkIf (cfg.enable && stylix.enable) {
@@ -18,7 +19,16 @@ in
           custom_palette = palette;
           mode = if stylix.polarity == "light" then "light" else "dark";
         };
-        shell.font_family = stylix.fonts.sansSerif.name;
+        shell = {
+          animation.enabled = false;
+          font_family = stylix.fonts.sansSerif.name;
+          setup_wizard_enabled = false;
+        };
+        bar.main = {
+          inherit scale;
+          position = "bottom";
+        };
+        accessibility.ui_scale = scale;
         wallpaper.default.path = stylix.image;
         dock.background_opacity = stylix.opacity.desktop;
         notification.background_opacity = stylix.opacity.popups;
