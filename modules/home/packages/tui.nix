@@ -8,9 +8,6 @@ in
       # filemanager {{{
       yazi
       # }}}
-      # nix helper {{{
-      nh
-      # }}}
       ;
     inherit (pkgsUnstable)
       # devenv {{{

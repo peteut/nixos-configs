@@ -15,13 +15,20 @@ in
     font = "Lat2-Terminus16";
     keyMap = "sg";
   };
+  # Weekly GC via `nh clean all` instead of nix.gc: it also prunes per-user
+  # profiles (home-manager generations), and always keeps a few generations
+  # for rollback on hosts that weren't rebuilt for a while.
+  programs.nh = {
+    enable = true;
+    clean = {
+      enable = true;
+      dates = "weekly";
+      extraArgs = "--keep-since 7d --keep 3";
+    };
+  };
+
   nix = {
     settings.auto-optimise-store = true;
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
     settings = {
       trusted-public-keys = [ (readFile ./../../nix-pub.pem) ];
       trusted-users = [ "root" "alain" ];
