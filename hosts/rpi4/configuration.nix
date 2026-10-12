@@ -36,7 +36,10 @@ in
     ];
     sdImage.compressImage = false;
     boot = {
-      kernelPackages = pkgs.linuxPackages_rpi4;
+      # Mainline kernel: in the binary cache (rpi4 is built on x1 under
+      # binfmt emulation) and sufficient for this headless box. Overrides the
+      # nixos-hardware RPi kernel (mkDefault); nixpkgs' linux_rpi4 is deprecated.
+      kernelPackages = pkgs.linuxPackages;
       supportedFilesystems.zfs = lib.mkForce false;
       # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
       loader.grub.enable = false;
