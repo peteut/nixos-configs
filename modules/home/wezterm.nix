@@ -1,6 +1,8 @@
 { lib, osConfig, pkgs, ... }:
 let
-  cfg = osConfig.modules.hyprland;
+  # Desktop session or WSL guest (WezTerm runs there via WSLg).
+  # modules.wsl only exists on hosts importing modules/wsl, hence `or false`.
+  enable = osConfig.modules.hyprland.enable || (osConfig.modules.wsl.enable or false);
   inherit (lib) mkIf;
   inherit (pkgs) fetchFromGitHub;
   wezPainControl = {
@@ -14,7 +16,7 @@ let
   };
 in
 {
-  programs.wezterm = mkIf cfg.enable {
+  programs.wezterm = mkIf enable {
     enable = true;
     extraConfig = ''
       local config = wezterm.config_builder()
@@ -35,7 +37,7 @@ in
       return config
     '';
   };
-  xdg.configFile = {
+  xdg.configFile = mkIf enable {
     "wezterm/${wezPainControl.path}" = {
       inherit (wezPainControl) source;
     };
