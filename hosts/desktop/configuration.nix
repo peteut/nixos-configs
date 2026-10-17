@@ -17,6 +17,10 @@
           (pkgs.llama-cpp.override { cudaSupport = true; })
         ];
       };
+      logseqSync = {
+        enable = true;
+        baseUrl = "https://desktop.tail1968e.ts.net";
+      };
     };
     boot.kernelModules = [ "tun" ];
     # Expose the Windows host's NVIDIA driver (libcuda) via /run/opengl-driver.
