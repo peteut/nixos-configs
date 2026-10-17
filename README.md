@@ -60,8 +60,7 @@ Tailscale-SSH into user-owned devices.
    state persists in `/home/logseq-sync/tailscale`):
 
    ```sh
-   sudo install -m 600 -o logseq-sync -g logseq-sync /dev/stdin \
-     /home/logseq-sync/tailscale.env <<< 'TS_AUTHKEY=tskey-auth-...'
+   echo 'TS_AUTHKEY=tskey-auth-...' | sudo install -m 600 -o logseq-sync -g logseq-sync /dev/stdin /home/logseq-sync/tailscale.env
    ```
 
    Afterwards the value may be emptied; keep the file, the unit requires it.
@@ -129,8 +128,7 @@ Commissioning, once:
 
 ```sh
 sudo chown logseq-sync: /mnt/c/Users/alain/OneDrive/backup/logseq-sync
-sudo install -m 600 -o logseq-sync -g logseq-sync /dev/stdin \
-  /home/logseq-sync/restic.password <<< "$(head -c 32 /dev/urandom | base64)"
+head -c 32 /dev/urandom | base64 | sudo install -m 600 -o logseq-sync -g logseq-sync /dev/stdin /home/logseq-sync/restic.password
 sudo cat /home/logseq-sync/restic.password   # store in the password manager!
 ```
 
