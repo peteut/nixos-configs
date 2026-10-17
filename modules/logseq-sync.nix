@@ -10,6 +10,8 @@ let
   # The image runs as nonroot (65532); keep-id maps it to svcUser on the host
   # so dataDir stays owned by svcUser and backups can read it directly.
   imageUid = 65532;
+  stagingDir = "${home}/backup-staging";
+  resticPasswordFile = "${home}/restic.password";
   tsStateDir = "${home}/tailscale";
   # Holds TS_AUTHKEY=tskey-auth-... (mode 600, not in the store). Only used
   # for the first login (TS_AUTH_ONCE); the node key lives in tsStateDir.
@@ -18,6 +20,23 @@ let
   # Raw ipn.ServeConfig, as `tailscale serve --service=svc:<name>
   # --https=443 http://127.0.0.1:8787` would write it: TLS terminated by
   # tailscaled, proxied to the sync server in the shared network namespace.
+  # Consistent copies of the live databases via SQLite's online backup API,
+  # so the container keeps running. Runs as svcUser: opening the databases
+  # as another user could leave -wal/-shm files the server cannot open.
+  backupPrepare = pkgs.writeShellScript "logseq-sync-backup-prepare" ''
+    set -euo pipefail
+    sqlite3=${lib.getExe pkgs.sqlite}
+    rm -rf ${stagingDir}
+    mkdir -p ${stagingDir}/graphs
+    $sqlite3 ${dataDir}/index.sqlite ".backup '${stagingDir}/index.sqlite'"
+    for db in ${dataDir}/graphs/*/db.sqlite; do
+      [ -e "$db" ] || continue
+      id=$(basename "$(dirname "$db")")
+      mkdir -p ${stagingDir}/graphs/"$id"
+      $sqlite3 "$db" ".backup '${stagingDir}/graphs/$id/db.sqlite'"
+    done
+  '';
+
   serveConfig = pkgs.writeText "logseq-serve.json" (builtins.toJSON {
     Services."svc:${cfg.serviceName}" = {
       TCP."443".HTTPS = true;
@@ -62,6 +81,16 @@ in
       description = ''
         Public URL of the sync server (DB_SYNC_BASE_URL). Must match the
         Sync Server URL configured in every Logseq client.
+      '';
+    };
+
+    backup.repository = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "/mnt/c/Users/me/OneDrive/backup/logseq-sync";
+      description = ''
+        restic repository for daily backups of the sync server data, or null
+        to disable. The password is read from ${resticPasswordFile}.
       '';
     };
 
@@ -116,6 +145,34 @@ in
       "d ${dataDir} 0750 ${svcUser} ${svcUser} -"
       "d ${tsStateDir} 0700 ${svcUser} ${svcUser} -"
     ];
+
+    services.restic.backups.logseq-sync = mkIf (cfg.backup.repository != null) {
+      user = svcUser;
+      inherit (cfg.backup) repository;
+      passwordFile = resticPasswordFile;
+      initialize = true;
+      backupPrepareCommand = "${backupPrepare}";
+      backupCleanupCommand = "rm -rf ${stagingDir}";
+      # Staged database copies plus everything else in dataDir (assets),
+      # minus the live databases.
+      paths = [ stagingDir dataDir ];
+      exclude = [
+        "${dataDir}/**/*.sqlite"
+        "${dataDir}/**/*.sqlite-wal"
+        "${dataDir}/**/*.sqlite-shm"
+      ];
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 4"
+        "--keep-monthly 6"
+        "--keep-yearly 1"
+      ];
+      timerConfig = {
+        OnCalendar = "daily";
+        Persistent = true; # catch up at next boot if desktop was off
+        RandomizedDelaySec = "1h";
+      };
+    };
 
     home-manager.users."${svcUser}" = {
       home = {

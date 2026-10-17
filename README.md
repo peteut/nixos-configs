@@ -115,6 +115,45 @@ Verify on `desktop`:
 sudo ls -l /home/logseq-sync/data /home/logseq-sync/data/graphs
 ```
 
+#### Backup and restore
+
+The sync server is the only server-side copy of the graphs. A daily restic job
+(`restic-backups-logseq-sync.service`, as `logseq-sync`) copies the databases
+with SQLite's online backup into `/home/logseq-sync/backup-staging` and
+snapshots them together with `data/assets` into
+`/mnt/c/Users/alain/OneDrive/backup/logseq-sync` (OneDrive, encrypted). Missed
+runs catch up at the next boot. Retention: 7 daily, 4 weekly, 6 monthly,
+1 yearly.
+
+Commissioning, once:
+
+```sh
+sudo chown logseq-sync: /mnt/c/Users/alain/OneDrive/backup/logseq-sync
+sudo install -m 600 -o logseq-sync -g logseq-sync /dev/stdin \
+  /home/logseq-sync/restic.password <<< "$(head -c 32 /dev/urandom | base64)"
+sudo cat /home/logseq-sync/restic.password   # store in the password manager!
+```
+
+In Explorer, set the `backup` folder to "Always keep on this device". Then run
+the first backup and check it:
+
+```sh
+sudo systemctl start restic-backups-logseq-sync
+sudo -u logseq-sync restic-logseq-sync snapshots
+sudo -u logseq-sync restic-logseq-sync check
+```
+
+Restore (test into a scratch directory first):
+
+```sh
+sudo -u logseq-sync restic-logseq-sync restore latest --target /home/logseq-sync/restore-test
+# stop the server, replace data/ with the restored files:
+#   backup-staging/{index.sqlite,graphs/<id>/db.sqlite} -> data/...
+#   data/assets -> data/assets
+sudo machinectl shell logseq-sync@ /run/current-system/sw/bin/systemctl --user stop podman-logseq-sync
+sudo machinectl shell logseq-sync@ /run/current-system/sw/bin/systemctl --user start podman-logseq-sync
+```
+
 ### TODO
 
 - [ ] remove clutter, move more stuff to `./modules`

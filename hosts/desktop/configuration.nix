@@ -20,6 +20,7 @@
       logseqSync = {
         enable = true;
         tailnet = "tail1968e.ts.net";
+        backup.repository = "/mnt/c/Users/alain/OneDrive/backup/logseq-sync";
       };
     };
     boot.kernelModules = [ "tun" ];
