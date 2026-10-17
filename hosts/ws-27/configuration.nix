@@ -14,10 +14,8 @@ in
       tailscale = {
         enable = true;
       };
-      user = {
-        enable = true;
-        ciRunner = true;
-      };
+      user.enable = true;
+      gitlabRunner.enable = true;
     };
     boot.kernelModules = [ "tun" ];
 
