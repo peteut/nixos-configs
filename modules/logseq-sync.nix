@@ -28,15 +28,9 @@ in
       description = "Port published on 127.0.0.1 only.";
     };
 
-    serviceName = mkOption {
-      type = types.str;
-      default = "logseq";
-      description = "Name of the Tailscale Service (svc:<name>) exposing the server.";
-    };
-
     baseUrl = mkOption {
       type = types.str;
-      example = "https://logseq.example.ts.net";
+      example = "https://desktop.example.ts.net";
       description = ''
         Public URL of the sync server (DB_SYNC_BASE_URL). Must match the
         Sync Server URL configured in every Logseq client.
@@ -45,20 +39,11 @@ in
   };
 
   config = mkIf cfg.enable {
-    assertions = [
-      {
-        # home-manager is imported and configured by modules.user.
-        assertion = config.modules.user.enable;
-        message = "modules.logseqSync requires modules.user.enable (home-manager).";
-      }
-      {
-        assertion = config.modules.tailscale.enable;
-        message = "modules.logseqSync requires modules.tailscale.enable.";
-      }
-    ];
-
-    modules.tailscale.services.${cfg.serviceName}.target =
-      "http://127.0.0.1:${toString cfg.port}";
+    assertions = [{
+      # home-manager is imported and configured by modules.user.
+      assertion = config.modules.user.enable;
+      message = "modules.logseqSync requires modules.user.enable (home-manager).";
+    }];
 
     users.users."${svcUser}" = {
       isNormalUser = true;
