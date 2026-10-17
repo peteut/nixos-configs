@@ -36,7 +36,7 @@ Tailscale-SSH into user-owned devices.
      },
      "grants": [
        {
-         "src": ["autogroup:member"],
+         "src": ["alain.peteut@…"], // own login only, not autogroup:member
          "dst": ["svc:logseq"],
          "ip": ["443"],
        },
@@ -99,19 +99,38 @@ scoop bucket add extras
 scoop install tailscale                  # elevated
 Get-Service Tailscale                    # if stopped (elevated):
 Start-Service Tailscale; Set-Service Tailscale -StartupType Automatic
-tailscale up --hostname=<host>-win       # e.g. desktop-win
+tailscale up --unattended --hostname=<host>-win   # e.g. desktop-win
 curl.exe -s https://logseq.tail1968e.ts.net/health
 ```
 
-In the Logseq 2.x DB client: log in with the Logseq account, set
-Settings → Advanced → Sync Server URL to `https://logseq.tail1968e.ts.net`,
-enable "Use Logseq Sync Beta". Create or upload the graph (`notes`) from one
-client only; others join the existing remote graph.
+`--unattended` keeps the service running without the tray app; without it the
+service shuts down as soon as the CLI disconnects, mid-login (stuck in
+"Tailscale is starting", state `NoState`).
 
-Verify on `desktop`:
+The sync server accepts any valid Logseq account, hence the grant is limited
+to the own login rather than `autogroup:member`.
+
+In the Logseq 2.x DB client: set Settings → Advanced → Sync Server URL to
+`https://logseq.tail1968e.ts.net`, enable "Use Logseq Sync Beta" and log in
+with the Logseq account; the sync button only appears when logged in. On first
+login the client asks for a password for remote graphs: it encrypts the graphs
+end to end and is needed on every new device. Store it in the password
+manager; without it the server copy and its backups cannot be decrypted.
+Upload the graph (`notes`) from one client only; others join the existing
+remote graph.
+
+Verify on `desktop` (expect one user, one graph, and
+`data/graphs/<id>/db.sqlite`):
 
 ```sh
-sudo ls -l /home/logseq-sync/data /home/logseq-sync/data/graphs
+sudo -u logseq-sync nix run nixpkgs#sqlite -- /home/logseq-sync/data/index.sqlite 'select count(*) from users; select count(*) from graphs;'
+sudo find /home/logseq-sync/data -type f -exec ls -l {} +
+```
+
+Server logs:
+
+```sh
+sudo machinectl shell logseq-sync@ /run/current-system/sw/bin/podman logs -f logseq-sync
 ```
 
 #### Backup and restore
