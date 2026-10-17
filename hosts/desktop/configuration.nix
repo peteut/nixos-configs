@@ -19,7 +19,7 @@
       };
       logseqSync = {
         enable = true;
-        baseUrl = "https://desktop.tail1968e.ts.net";
+        baseUrl = "https://logseq.tail1968e.ts.net";
       };
     };
     boot.kernelModules = [ "tun" ];
