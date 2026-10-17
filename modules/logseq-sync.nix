@@ -29,12 +29,21 @@ let
     rm -rf ${stagingDir}
     mkdir -p ${stagingDir}/graphs
     $sqlite3 ${dataDir}/index.sqlite ".backup '${stagingDir}/index.sqlite'"
+    n=0
     for db in ${dataDir}/graphs/*/db.sqlite; do
       [ -e "$db" ] || continue
       id=$(basename "$(dirname "$db")")
       mkdir -p ${stagingDir}/graphs/"$id"
       $sqlite3 "$db" ".backup '${stagingDir}/graphs/$id/db.sqlite'"
+      n=$((n + 1))
     done
+    # A backup without any graph is almost certainly wrong (layout change,
+    # nothing synced yet); fail the unit instead of snapshotting nothing.
+    if [ "$n" -eq 0 ]; then
+      echo "no graph databases found under ${dataDir}/graphs" >&2
+      exit 1
+    fi
+    echo "staged $n graph database(s)"
   '';
 
   serveConfig = pkgs.writeText "logseq-serve.json" (builtins.toJSON {
